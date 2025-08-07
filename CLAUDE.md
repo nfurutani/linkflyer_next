@@ -6,6 +6,11 @@
    - ファイルを削除していないのに「削除した」と言わない
    - 常に正確な状況を報告する
 
+2. **各Phase完了後は必ずREADME.md更新 - ALWAYS**
+   - Phase完了時は即座にREADME.mdの進捗状況を更新する
+   - 完了項目を✅に変更し、次のPhaseを現在実行中に変更する
+   - ユーザーに言われる前に自動的に更新すること
+
 ## Overview
 LinkFlyer NextはReact版からNext.js 14 App Routerへの移行プロジェクトです。SSR/SSGの利点を活かしつつ、SoundCloud Widget APIを使用したグローバル音楽再生機能を実装し、パフォーマンスとSEOを向上させます。
 
