@@ -25,20 +25,7 @@ const GlobalModal: React.FC = () => {
   // seek実行後の短期間自動更新を抑制するためのref
   const seekTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-  // デバッグ用のstate変化監視
-  useEffect(() => {
-    console.log(`🖱️ Global isDragging changed: ${isDragging}`)
-  }, [isDragging])
 
-  useEffect(() => {
-    console.log(`🎯 Global dragTime changed: ${dragTime.toFixed(2)}s`)
-  }, [dragTime])
-
-  useEffect(() => {
-    console.log(`⏰ Global currentTime changed: ${globalCurrentTime.toFixed(2)}s`)
-  }, [globalCurrentTime])
-
-  // プログレスバーのシーク機能（React版準拠の安定性向上版）
   const seekToPosition = useCallback((clientX: number, progressBarElement: HTMLElement, updateOnly = false) => {
     const rect = progressBarElement.getBoundingClientRect()
     const clickX = clientX - rect.left
@@ -46,40 +33,31 @@ const GlobalModal: React.FC = () => {
     const seekTime = progressPercent * globalDuration
 
     if (updateOnly) {
-      // ドラッグ中の視覚的フィードバック用のみ（seekTo実行なし）
       setDragTime(seekTime)
     } else {
-      // 実際のシーク実行
       const clampedSeekTime = Math.max(0, Math.min(seekTime, globalDuration))
-      console.log(`🎯 Global Modal seekToPosition: ${clampedSeekTime.toFixed(2)}s`)
       globalSeekTo(clampedSeekTime)
     }
   }, [globalDuration, globalSeekTo])
 
-  // プログレスバーのクリック/ドラッグ処理（修正版）
   const handleProgressBarMouseDown = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (globalDuration <= 0) return
     
     e.preventDefault()
-    console.log(`🖱️ Global MouseDown: 開始`)
     const progressBar = e.currentTarget
     setIsDragging(true)
     
-    // 初回クリックは視覚的フィードバックのみ
     seekToPosition(e.clientX, progressBar, true)
 
     const handleMouseMove = (e: MouseEvent) => {
       e.preventDefault()
-      console.log(`🖱️ Global MouseMove`)
-      seekToPosition(e.clientX, progressBar, true) // ドラッグ中は視覚的フィードバックのみ
+      seekToPosition(e.clientX, progressBar, true)
     }
 
     const handleMouseUp = (e: MouseEvent) => {
       e.preventDefault()
-      console.log(`🖱️ Global MouseUp: 最終seek実行`)
       setIsDragging(false)
       
-      // 最終的な位置でseek実行（updateOnly=false）
       seekToPosition(e.clientX, progressBar, false)
       
       document.removeEventListener('mousemove', handleMouseMove)
@@ -90,35 +68,32 @@ const GlobalModal: React.FC = () => {
     document.addEventListener('mouseup', handleMouseUp)
   }, [seekToPosition, globalDuration])
 
-  // タッチ操作対応（React版の正確な実装）
   const handleProgressBarTouchStart = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
     if (!progressBarRef.current || globalDuration <= 0) return
     
-    e.preventDefault() // スクロール防止
+    e.preventDefault()
     setIsDragging(true)
     const touch = e.touches[0]
     if (touch) {
-      seekToPosition(touch.clientX, progressBarRef.current, true) // updateOnly=true
+      seekToPosition(touch.clientX, progressBarRef.current, true)
     }
   }, [seekToPosition, globalDuration])
 
   const handleProgressBarTouchMove = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
     if (!isDragging || !progressBarRef.current) return
     
-    e.preventDefault() // スクロール防止
+    e.preventDefault()
     const touch = e.touches[0]
     if (touch) {
-      seekToPosition(touch.clientX, progressBarRef.current, true) // updateOnly=true
+      seekToPosition(touch.clientX, progressBarRef.current, true)
     }
   }, [seekToPosition, isDragging])
 
   const handleProgressBarTouchEnd = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
     if (!isDragging || !progressBarRef.current) return
     
-    e.preventDefault() // スクロール防止
-    console.log(`📱 Global TouchEnd: 最終seek実行`)
+    e.preventDefault()
     
-    // 最終的な位置でseek実行（updateOnly=false）
     const touch = e.changedTouches[0]
     if (touch) {
       seekToPosition(touch.clientX, progressBarRef.current, false)

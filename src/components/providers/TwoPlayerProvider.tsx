@@ -134,11 +134,9 @@ export const TwoPlayerProvider: React.FC<TwoPlayerProviderProps> = ({ children }
 
   // プレイヤーが再生されたことをマーク（他のプレイヤーを削除）
   const markPlayerAsPlayed = useCallback((url: string, trackInfo?: TrackInfo) => {
-    console.log('markPlayerAsPlayed called for:', url)
     const player = playersRef.current.get(url)
     if (player) {
       player.hasPlayed = true
-      console.log('Player marked as played:', url)
       setPlayersVersion(prev => prev + 1)
       
       // グローバル状態を更新
@@ -160,14 +158,12 @@ export const TwoPlayerProvider: React.FC<TwoPlayerProviderProps> = ({ children }
         }
       })
       
-      console.log('Players to delete:', playersToDelete)
       
       // 少し遅延してから削除（Widget APIの通信が完了してから）
       setTimeout(() => {
         playersToDelete.forEach(urlToDelete => {
           const playerToDelete = playersRef.current.get(urlToDelete)
           if (playerToDelete) {
-            console.log('Deleting player for:', urlToDelete)
             
             // widgetがあればunbindしてから削除
             if (playerToDelete.widget && window.SC) {
@@ -178,14 +174,13 @@ export const TwoPlayerProvider: React.FC<TwoPlayerProviderProps> = ({ children }
                 playerToDelete.widget.unbind(window.SC.Widget.Events.PLAY_PROGRESS)
                 playerToDelete.widget.unbind(window.SC.Widget.Events.FINISH)
               } catch (e) {
-                console.log('Unbind error for', urlToDelete, ':', (e as Error).message)
+                // Unbind error - ignore
               }
             }
             
             // iframeをDOMから削除
             if (playerToDelete.iframe && playerToDelete.iframe.parentNode) {
               playerToDelete.iframe.parentNode.removeChild(playerToDelete.iframe)
-              console.log('iframe removed for:', urlToDelete)
             }
             
             // プレイヤー削除イベントを発火
@@ -195,12 +190,10 @@ export const TwoPlayerProvider: React.FC<TwoPlayerProviderProps> = ({ children }
             window.dispatchEvent(deleteEvent)
             
             playersRef.current.delete(urlToDelete)
-            console.log('Player deleted from map:', urlToDelete)
             setPlayersVersion(prev => prev + 1)
           }
         })
         
-        console.log('Remaining players after deletion:', Array.from(playersRef.current.keys()))
       }, 500)
     }
   }, [globalCurrentTrack])
@@ -255,12 +248,10 @@ export const TwoPlayerProvider: React.FC<TwoPlayerProviderProps> = ({ children }
       console.log('Closing local modal to open global modal')
     }
     setGlobalModalVisible(true)
-    console.log('Global modal shown')
   }, [localModalOpen])
 
   const hideGlobalModal = useCallback(() => {
     setGlobalModalVisible(false)
-    console.log('Global modal hidden')
   }, [])
 
   // グローバルプレイヤー操作
@@ -278,7 +269,6 @@ export const TwoPlayerProvider: React.FC<TwoPlayerProviderProps> = ({ children }
     setGlobalIsPlaying(false)
     setGlobalMiniPlayerVisible(false)
     setGlobalCurrentTrack(null)
-    console.log('Global mini player hidden')
   }, [getGlobalPlayer])
 
   // グローバルプレイヤー制御
@@ -304,7 +294,6 @@ export const TwoPlayerProvider: React.FC<TwoPlayerProviderProps> = ({ children }
     const player = getGlobalPlayer()
     if (!player?.widget) return
     
-    console.log(`🎯 globalSeekTo: ${time.toFixed(2)}s`)
     
     // seek実行前に即座に状態を更新（位置戻りを防ぐ）
     setGlobalCurrentTime(time)
@@ -318,7 +307,6 @@ export const TwoPlayerProvider: React.FC<TwoPlayerProviderProps> = ({ children }
     }
     globalSeekTimeoutRef.current = setTimeout(() => {
       globalSeekTimeoutRef.current = null
-      console.log(`⏰ globalSeek抑制期間終了`)
     }, 600) // グローバルは600ms
   }, [getGlobalPlayer])
 
@@ -343,10 +331,8 @@ export const TwoPlayerProvider: React.FC<TwoPlayerProviderProps> = ({ children }
       const currentSeconds = data.currentPosition / 1000
       // seek直後の短い期間は自動更新をスキップ
       if (!globalSeekTimeoutRef.current) {
-        console.log(`🎵 Global PLAY_PROGRESS: ${currentSeconds.toFixed(2)}s`)
         setGlobalCurrentTime(currentSeconds)
       } else {
-        console.log(`🚫 Global PLAY_PROGRESS: ${currentSeconds.toFixed(2)}s (スキップ - seek直後)`)
       }
     }
 
