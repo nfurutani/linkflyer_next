@@ -55,20 +55,6 @@ const SoundCloudPlayerV3SingleTwo: React.FC<SoundCloudPlayerV3SingleTwoProps> = 
   
   // seek実行後の短期間自動更新を抑制するためのref
   const seekTimeoutRef = useRef<NodeJS.Timeout | null>(null)
-  
-  // デバッグ用のstate変化監視
-  useEffect(() => {
-    console.log(`🖱️ isDragging changed: ${isDragging}`)
-  }, [isDragging])
-  
-  useEffect(() => {
-    console.log(`🎯 dragTime changed: ${dragTime.toFixed(2)}s`)
-  }, [dragTime])
-  
-  useEffect(() => {
-    console.log(`⏰ currentTime changed: ${currentTime.toFixed(2)}s`)
-  }, [currentTime])
-  
   const playerRef = useRef<any>(null)
 
   // このトラックがグローバルに再生中かチェック
@@ -80,11 +66,6 @@ const SoundCloudPlayerV3SingleTwo: React.FC<SoundCloudPlayerV3SingleTwoProps> = 
   const displayDuration = isGlobalTrack ? globalDuration : duration
   const displayCurrentTime = isDragging ? dragTime : (isGlobalTrack ? globalCurrentTime : currentTime)
   
-  // displayCurrentTime計算をデバッグ
-  useEffect(() => {
-    const source = isDragging ? 'dragTime' : (isGlobalTrack ? 'globalCurrentTime' : 'currentTime')
-    console.log(`📺 displayCurrentTime: ${displayCurrentTime.toFixed(2)}s (source: ${source}, isDragging=${isDragging}, isGlobal=${isGlobalTrack})`)
-  }, [displayCurrentTime, isDragging, isGlobalTrack])
 
   const trackInfo = {
     sc_title,
@@ -106,9 +87,7 @@ const SoundCloudPlayerV3SingleTwo: React.FC<SoundCloudPlayerV3SingleTwoProps> = 
     playerRef.current.widget = widget
     setPlayerWidget(url, widget)
 
-    // イベントバインディング
     widget.bind(window.SC.Widget.Events.READY, () => {
-      // Player ready
       setIsReady(true)
       
       widget.getDuration((dur: number) => {
@@ -117,44 +96,35 @@ const SoundCloudPlayerV3SingleTwo: React.FC<SoundCloudPlayerV3SingleTwoProps> = 
     })
 
     widget.bind(window.SC.Widget.Events.PLAY, () => {
-      // Play event
       setIsPlaying(true)
       markPlayerAsPlayed(url, trackInfo)
       setShowMiniPlayer(true)
     })
 
     widget.bind(window.SC.Widget.Events.PAUSE, () => {
-      // Pause event
       setIsPlaying(false)
     })
 
     widget.bind(window.SC.Widget.Events.PLAY_PROGRESS, (data: any) => {
       const currentSeconds = data.currentPosition / 1000
-      // グローバルトラックの場合はローカル更新をスキップ（グローバル状態が管理）
       if (isGlobalTrack) {
-        console.log(`🚫 PLAY_PROGRESS: ${currentSeconds.toFixed(2)}s (スキップ - グローバルトラック)`)
         return
       }
       
       // ドラッグ中およびseek直後の短い期間は自動更新をスキップ
       if (!isDragging && !seekTimeoutRef.current) {
-        console.log(`🎵 PLAY_PROGRESS: ${currentSeconds.toFixed(2)}s`)
         setCurrentTime(currentSeconds)
       } else {
-        console.log(`🚫 PLAY_PROGRESS: ${currentSeconds.toFixed(2)}s (スキップ - ドラッグ=${isDragging}, seekTimeout=${!!seekTimeoutRef.current})`)
       }
     })
 
     widget.bind(window.SC.Widget.Events.FINISH, () => {
-      // Finish event
       setIsPlaying(false)
       setCurrentTime(0)
     })
-  }, [url, markPlayerAsPlayed, setPlayerWidget, trackInfo, isDragging])
+  }, [url, markPlayerAsPlayed, setPlayerWidget, trackInfo, isGlobalTrack])
 
-  // モーダルを開く
   const openModal = useCallback(() => {
-    // Opening modal
     setShowModal(true)
     setLocalModalOpen(true)
 
@@ -163,18 +133,15 @@ const SoundCloudPlayerV3SingleTwo: React.FC<SoundCloudPlayerV3SingleTwoProps> = 
       playerRef.current = player
       
       if (isNew) {
-        // 新しいプレイヤーの場合、SoundCloud Widget APIの読み込みを待つ
         if (window.SC) {
           setupWidget()
         } else {
-          // SoundCloud Widget APIを動的に読み込み
           const script = document.createElement('script')
           script.src = 'https://w.soundcloud.com/player/api.js'
           script.onload = setupWidget
           document.head.appendChild(script)
         }
       } else {
-        // 既存のプレイヤーの場合、すでにセットアップ済み
         if (player.widget) {
           setIsReady(true)
           player.widget.getDuration((dur: number) => {
@@ -191,15 +158,12 @@ const SoundCloudPlayerV3SingleTwo: React.FC<SoundCloudPlayerV3SingleTwoProps> = 
     }
   }, [url, getOrCreatePlayer, setupWidget, setLocalModalOpen])
 
-  // モーダルを閉じる
   const closeModal = useCallback(() => {
-    // Closing modal
     setShowModal(false)
     setLocalModalOpen(false)
     onModalClose(url)
   }, [url, onModalClose, setLocalModalOpen])
 
-  // プレイ/ポーズトグル
   const togglePlay = useCallback(() => {
     if (!playerRef.current?.widget || !isReady) return
 
@@ -210,7 +174,6 @@ const SoundCloudPlayerV3SingleTwo: React.FC<SoundCloudPlayerV3SingleTwoProps> = 
     }
   }, [displayIsPlaying, isReady])
 
-  // いいねトグル - グローバル状態も更新
   const toggleLike = useCallback(() => {
     if (isGlobalTrack) {
       // グローバルトラックの場合はグローバル状態を更新
@@ -251,47 +214,36 @@ const SoundCloudPlayerV3SingleTwo: React.FC<SoundCloudPlayerV3SingleTwoProps> = 
           
           // SoundCloud Widget APIに送信
           playerRef.current.widget.seekTo(clampedSeekTime * 1000)
-        } else {
-          // Seek conditions not met
         }
       }
     }
-  }, [displayDuration, isReady, isDragging])
+  }, [displayDuration, isReady, isGlobalTrack, globalSeekTo])
 
-  // プログレスバーのクリック/ドラッグ処理（修正版）
   const handleProgressBarMouseDown = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (!isReady || displayDuration <= 0) return
     
     e.preventDefault()
-    console.log(`🖱️ MouseDown: 開始`)
     const progressBar = e.currentTarget
     setIsDragging(true)
     
-    // 初回クリックは視覚的フィードバックのみ
     seekToPosition(e.clientX, progressBar, true)
 
     const handleMouseMove = (e: MouseEvent) => {
       e.preventDefault()
-      console.log(`🖱️ MouseMove`)
-      seekToPosition(e.clientX, progressBar, true) // ドラッグ中は視覚的フィードバックのみ
+      seekToPosition(e.clientX, progressBar, true)
     }
 
     const handleMouseUp = (e: MouseEvent) => {
       e.preventDefault()
-      console.log(`🖱️ MouseUp: 最終seek実行`)
       setIsDragging(false)
       
-      // 最終的な位置でseek実行（updateOnly=false）
       seekToPosition(e.clientX, progressBar, false)
-      
-      // ローカルトラックの場合のみseek抑制を設定
       if (!isGlobalTrack) {
         if (seekTimeoutRef.current) {
           clearTimeout(seekTimeoutRef.current)
         }
         seekTimeoutRef.current = setTimeout(() => {
           seekTimeoutRef.current = null
-          console.log(`⏰ seek抑制期間終了`)
         }, 800) // 800ms間は自動更新を抑制
       }
       
@@ -311,7 +263,7 @@ const SoundCloudPlayerV3SingleTwo: React.FC<SoundCloudPlayerV3SingleTwoProps> = 
     setIsDragging(true)
     const touch = e.touches[0]
     if (touch) {
-      seekToPosition(touch.clientX, e.currentTarget, true) // updateOnly=true
+      seekToPosition(touch.clientX, e.currentTarget, true)
     }
   }, [seekToPosition, isReady, displayDuration])
 
@@ -321,7 +273,7 @@ const SoundCloudPlayerV3SingleTwo: React.FC<SoundCloudPlayerV3SingleTwoProps> = 
     e.preventDefault() // スクロール防止
     const touch = e.touches[0]
     if (touch) {
-      seekToPosition(touch.clientX, e.currentTarget, true) // updateOnly=true
+      seekToPosition(touch.clientX, e.currentTarget, true)
     }
   }, [seekToPosition, isDragging, isReady])
 
@@ -329,21 +281,16 @@ const SoundCloudPlayerV3SingleTwo: React.FC<SoundCloudPlayerV3SingleTwoProps> = 
     if (!isDragging) return
     
     e.preventDefault() // スクロール防止
-    console.log(`📱 TouchEnd: 最終seek実行`)
     
-    // 最終的な位置でseek実行（updateOnly=false）
     const touch = e.changedTouches[0]
     if (touch) {
       seekToPosition(touch.clientX, e.currentTarget, false)
-      
-      // ローカルトラックの場合のみseek抑制を設定
       if (!isGlobalTrack) {
         if (seekTimeoutRef.current) {
           clearTimeout(seekTimeoutRef.current)
         }
         seekTimeoutRef.current = setTimeout(() => {
           seekTimeoutRef.current = null
-          console.log(`⏰ seek抑制期間終了 (Touch)`)
         }, 800) // 800ms間は自動更新を抑制
       }
     }
@@ -355,31 +302,24 @@ const SoundCloudPlayerV3SingleTwo: React.FC<SoundCloudPlayerV3SingleTwoProps> = 
   useEffect(() => {
     // グローバルトラックの場合はTwoPlayerProviderが管理するのでスキップ
     if (isGlobalTrack) {
-      console.log(`⏰ グローバルトラックのためposition pollingをスキップ`)
       return
     }
     
     if (!isPlaying || !playerRef.current?.widget || isDragging) return
 
-    console.log(`⏰ Starting position polling (500ms) - isPlaying=${isPlaying}, isDragging=${isDragging}`)
 
     const interval = setInterval(() => {
       if (playerRef.current?.widget) {
         playerRef.current.widget.getPosition((pos: number) => {
-          // ドラッグ中およびseek直後の短い期間は更新しない
           if (!isDragging && !seekTimeoutRef.current) {
             const seconds = pos / 1000
-            console.log(`⏱️ getPosition: ${seconds.toFixed(2)}s`)
             setCurrentTime(seconds)
-          } else {
-            console.log(`⏱️ getPosition: スキップ (ドラッグ=${isDragging}, seekTimeout=${!!seekTimeoutRef.current})`)
           }
         })
       }
-    }, 500) // React版と同じ500ms間隔
+    }, 500)
 
     return () => {
-      console.log(`⏰ Stopping position polling`)
       clearInterval(interval)
     }
   }, [isPlaying, isDragging, isGlobalTrack])
@@ -388,7 +328,6 @@ const SoundCloudPlayerV3SingleTwo: React.FC<SoundCloudPlayerV3SingleTwoProps> = 
   useEffect(() => {
     const handleCloseLocalModal = () => {
       if (showModal) {
-        console.log('Closing local modal due to global event')
         setShowModal(false)
       }
     }
@@ -401,7 +340,6 @@ const SoundCloudPlayerV3SingleTwo: React.FC<SoundCloudPlayerV3SingleTwoProps> = 
   useEffect(() => {
     const handlePlayerDeleted = (e: CustomEvent) => {
       if (e.detail.url === url) {
-        console.log('Player deleted for:', url)
         setIsReady(false)
         setIsPlaying(false)
         setCurrentTime(0)
