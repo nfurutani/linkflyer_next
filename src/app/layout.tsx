@@ -31,7 +31,7 @@ export default function RootLayout({
           <div id="global-player-container" />
           
           {/* Main content */}
-          <main className="pb-20">
+          <main>
             {children}
           </main>
           

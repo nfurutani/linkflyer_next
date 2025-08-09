@@ -1,8 +1,16 @@
 'use client'
 
-import React from 'react'
-import Link from 'next/link'
+import React, { useState, useEffect } from 'react'
+import Image from 'next/image'
 import SoundCloudPlayerV3SingleTwo from '../components/SoundCloudPlayerV3SingleTwo'
+
+// Define social platforms to display
+const socialPlatforms = [
+  { id: 'instagram', name: 'Instagram', field: 'instagram_username', type: 'username' },
+  { id: 'soundcloud', name: 'SoundCloud', field: 'soundcloud_url', type: 'url' },
+  { id: 'bandcamp', name: 'Bandcamp', field: 'bandcamp_url', type: 'url' },
+  { id: 'discogs', name: 'Discogs', field: 'discogs_url', type: 'url' },
+]
 
 // 実際のSoundCloudトラックデータ（音声切り替えテスト用）
 const sampleTracks = [
@@ -37,97 +45,144 @@ const sampleTracks = [
 ]
 
 export default function HomePage() {
+  const [activeTab, setActiveTab] = useState<'audio' | 'flyers'>('audio')
+  const [svgIcons, setSvgIcons] = useState<Record<string, string>>({})
+
+  // User profile data
+  const profile = {
+    username: "Iori",
+    bio: "Creating immersive soundscapes and memorable musical experiences.",
+    profile_image: "/iori_asano-profile.jpg",
+    instagram_username: "iori_asano",
+    soundcloud_url: "https://soundcloud.com/iori927/",
+    bandcamp_url: "https://ioriasano.bandcamp.com/",
+    discogs_url: "https://www.discogs.com/artist/1625337-Iori/"
+  }
+
+  // Load SVG icons
+  useEffect(() => {
+    const loadSvgIcons = async () => {
+      const icons: Record<string, string> = {}
+      
+      // Load all SVG icons
+      for (const platform of socialPlatforms) {
+        try {
+          const response = await fetch(`/icons/${platform.id}.svg`)
+          if (response.ok) {
+            const svgText = await response.text()
+            icons[platform.id] = svgText
+          }
+        } catch (error) {
+          console.error(`Error loading ${platform.id} icon:`, error)
+        }
+      }
+      
+      setSvgIcons(icons)
+    }
+
+    loadSvgIcons()
+  }, [])
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* ヘッダー */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link href="/" className="text-2xl font-bold text-gray-900 hover:text-orange-600">
-              LinkFlyer
-            </Link>
-            <nav className="hidden md:flex space-x-8">
-              <Link href="/discover" className="text-gray-500 hover:text-orange-600 font-medium">
-                Discover
-              </Link>
-              <Link href="/trending" className="text-gray-500 hover:text-orange-600 font-medium">
-                Trending
-              </Link>
-              <Link href="/artists" className="text-gray-500 hover:text-orange-600 font-medium">
-                Artists
-              </Link>
-            </nav>
+    <div className="min-h-screen bg-gray-100 py-8">
+      <div className="max-w-md mx-auto px-4">
+        {/* Profile Header */}
+        <div className="text-center mb-8">
+          <div className="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden">
+            <Image
+              src={profile.profile_image}
+              alt={profile.username}
+              width={96}
+              height={96}
+              className="w-full h-full object-cover"
+              priority
+            />
+          </div>
+          <h1 className="text-2xl font-bold">{profile.username}</h1>
+          <p className="mt-2 text-gray-600">{profile.bio}</p>
+          
+          {/* Social Icons */}
+          <div className="mt-4 flex justify-center space-x-4">
+            {socialPlatforms.map((platform) => {
+              const value = profile[platform.field as keyof typeof profile] as string | null
+              if (!value) return null
+
+              // Construct URL based on platform type
+              let url = ''
+              if (platform.type === 'username') {
+                if (platform.id === 'instagram') url = `https://instagram.com/${value}`
+              } else {
+                url = value
+              }
+
+              return (
+                <a 
+                  key={platform.id}
+                  href={url} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="text-gray-600 hover:text-gray-900 transition-colors"
+                >
+                  <span className="sr-only">{platform.name}</span>
+                  <div 
+                    className="w-6 h-6"
+                    dangerouslySetInnerHTML={{ __html: svgIcons[platform.id] || '' }}
+                  />
+                </a>
+              )
+            })}
           </div>
         </div>
-      </header>
 
-      {/* メインコンテンツ */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* ヒーローセクション */}
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            Discover Amazing Music
-          </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Explore and listen to tracks from talented artists around the world with our Two Player architecture.
-          </p>
+        {/* Tabs */}
+        <div className="flex border-b border-gray-200 mb-6">
+          <button
+            onClick={() => setActiveTab('audio')}
+            className={`flex-1 py-2 px-4 text-center font-medium transition-colors ${
+              activeTab === 'audio'
+                ? 'text-orange-600 border-b-2 border-orange-600'
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            Audio
+          </button>
+          <button
+            onClick={() => setActiveTab('flyers')}
+            className={`flex-1 py-2 px-4 text-center font-medium transition-colors ${
+              activeTab === 'flyers'
+                ? 'text-orange-600 border-b-2 border-orange-600'
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            Flyers
+          </button>
         </div>
 
-        {/* トラック一覧 */}
-        <div className="mb-8">
-          <h3 className="text-2xl font-bold text-gray-900 mb-6">Featured Tracks</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {sampleTracks.map((track, index) => (
-              <div key={index} className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow">
+        {/* Tab Content */}
+        {activeTab === 'audio' ? (
+          <>
+            {/* Audio Tracks Grid */}
+            <div className="grid grid-cols-2 gap-4 mb-8">
+              {sampleTracks.map((track, index) => (
                 <SoundCloudPlayerV3SingleTwo
+                  key={`player-grid-${index}`}
                   sc_title={track.sc_title}
-                  user_name={track.user_name}
+                  user_name={profile.username}
                   sc_img={track.sc_img}
                   url={track.url}
-                  bio={track.bio}
-                  shop_link={track.shop_link}
+                  profile_img={profile.profile_image}
+                  bio={profile.bio}
+                  shop_link={undefined}
                 />
-              </div>
-            ))}
+              ))}
+            </div>
+          </>
+        ) : (
+          /* Flyers Grid */
+          <div className="text-center py-12 text-gray-500">
+            <p>No flyers yet</p>
           </div>
-        </div>
-
-        {/* 機能説明セクション */}
-        <div className="bg-white rounded-lg shadow-md p-8">
-          <h3 className="text-2xl font-bold text-gray-900 mb-6">Two Player Architecture</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <h4 className="text-lg font-semibold text-gray-900 mb-3">Local Modal</h4>
-              <ul className="space-y-2 text-gray-600">
-                <li>• トラック固有のローカルモーダル</li>
-                <li>• ドラッグ対応のプログレスバー</li>
-                <li>• ローカルミニプレイヤー</li>
-                <li>• アーティスト情報表示</li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-lg font-semibold text-gray-900 mb-3">Global System</h4>
-              <ul className="space-y-2 text-gray-600">
-                <li>• グローバルミニプレイヤー</li>
-                <li>• フルスクリーングローバルモーダル</li>
-                <li>• ページ間での再生継続</li>
-                <li>• 最大2プレイヤー管理</li>
-              </ul>
-            </div>
-          </div>
-          <div className="mt-6 space-y-4">
-            <div className="p-4 bg-blue-50 rounded-lg">
-              <p className="text-sm text-blue-800">
-                <strong>🎵 音声切り替えテスト:</strong> 4つの異なるDiscoハウス/クラシック楽曲でTwo Player Architectureの動作確認が可能です。
-              </p>
-            </div>
-            <div className="p-4 bg-green-50 rounded-lg">
-              <p className="text-sm text-green-800">
-                <strong>🌍 ページ遷移テスト:</strong> 音楽を再生中に <Link href="/discover" className="underline font-semibold">Discover</Link>, <Link href="/trending" className="underline font-semibold">Trending</Link>, <Link href="/artists" className="underline font-semibold">Artists</Link> ページに遷移して再生継続を確認できます。
-              </p>
-            </div>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   )

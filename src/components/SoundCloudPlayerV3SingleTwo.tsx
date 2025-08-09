@@ -50,7 +50,6 @@ const SoundCloudPlayerV3SingleTwo: React.FC<SoundCloudPlayerV3SingleTwoProps> = 
   const [isLiked, setIsLiked] = useState(false)
   const [duration, setDuration] = useState(0)
   const [currentTime, setCurrentTime] = useState(0)
-  const [showMiniPlayer, setShowMiniPlayer] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
   const [dragTime, setDragTime] = useState(0)
   const [isInitialized, setIsInitialized] = useState(false)
@@ -102,7 +101,6 @@ const SoundCloudPlayerV3SingleTwo: React.FC<SoundCloudPlayerV3SingleTwoProps> = 
       setIsPlaying(true)
       setIsInitialized(true)
       markPlayerAsPlayed(url, trackInfo)
-      setShowMiniPlayer(true)
     })
 
     widget.bind(window.SC.Widget.Events.PAUSE, () => {
@@ -390,7 +388,6 @@ const SoundCloudPlayerV3SingleTwo: React.FC<SoundCloudPlayerV3SingleTwoProps> = 
         setIsReady(false)
         setIsPlaying(false)
         setCurrentTime(0)
-        setShowMiniPlayer(false)
         setIsInitialized(false)
         initClickedRef.current = false
         playerRef.current = null
@@ -412,27 +409,16 @@ const SoundCloudPlayerV3SingleTwo: React.FC<SoundCloudPlayerV3SingleTwoProps> = 
     <>
       {/* メインプレイヤーボタン */}
       <div 
-        className="relative cursor-pointer group"
+        className="relative cursor-pointer"
         onClick={openModal}
       >
-        <div className="relative">
-          <Image
-            src={sc_img}
-            alt={sc_title}
-            width={300}
-            height={300}
-            className="w-full aspect-square object-cover rounded-lg"
-          />
-          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 rounded-lg flex items-center justify-center">
-            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-              <div className="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center shadow-lg">
-                <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M8 5v14l11-7z"/>
-                </svg>
-              </div>
-            </div>
-          </div>
-        </div>
+        <Image
+          src={sc_img}
+          alt={sc_title}
+          width={300}
+          height={300}
+          className="w-full aspect-square object-cover rounded-lg"
+        />
         
         <div className="mt-2">
           <h3 className="font-semibold text-sm line-clamp-1">{sc_title}</h3>
@@ -569,36 +555,6 @@ const SoundCloudPlayerV3SingleTwo: React.FC<SoundCloudPlayerV3SingleTwoProps> = 
         </div>
       )}
 
-      {/* ミニプレイヤー（ローカル表示用） */}
-      {showMiniPlayer && !isGlobalTrack && (
-        <div className="fixed bottom-4 right-4 bg-white shadow-lg rounded-lg p-3 flex items-center space-x-3 z-40">
-          <Image
-            src={sc_img}
-            alt={sc_title}
-            width={40}
-            height={40}
-            className="w-10 h-10 object-cover rounded"
-          />
-          <div className="flex-1 min-w-0">
-            <p className="font-medium text-sm line-clamp-1">{sc_title}</p>
-            <p className="text-gray-500 text-xs line-clamp-1">{user_name}</p>
-          </div>
-          <button
-            onClick={togglePlay}
-            className="w-8 h-8 bg-orange-500 hover:bg-orange-600 rounded-full flex items-center justify-center text-white"
-          >
-            {displayIsPlaying ? (
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M6 4h4v16H6zM14 4h4v16h-4z"/>
-              </svg>
-            ) : (
-              <svg className="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M8 5v14l11-7z"/>
-              </svg>
-            )}
-          </button>
-        </div>
-      )}
     </>
   )
 }
