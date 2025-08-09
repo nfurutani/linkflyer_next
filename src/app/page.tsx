@@ -7,33 +7,32 @@ import SoundCloudPlayerV3SingleTwo from '../components/SoundCloudPlayerV3SingleT
 // 実際のSoundCloudトラックデータ（音声切り替えテスト用）
 const sampleTracks = [
   {
-    sc_title: "Daniel Wang at Lente Kabinet Festival 2019",
-    user_name: "DKMNTL",
-    sc_img: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDMwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRkY2QjM1Ii8+Cjx0ZXh0IHg9IjE1MCIgeT0iMTQwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iMC4zZW0iPkRhbmllbCBXYW5nPC90ZXh0Pjx0ZXh0IHg9IjE1MCIgeT0iMTYwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iMC4zZW0iPkxlbnRlIEthYmluZXQ8L3RleHQ+PC9zdmc+",
-    url: "https://soundcloud.com/dkmntl/daniel-wang-at-lente-kabinet-festival-2019",
-    bio: "Live set from Lente Kabinet Festival 2019. Two Player architecture test track #1.",
-    shop_link: "https://dkmntl.com"
+    sc_title: "UGNG4.2",
+    user_name: "Impropertouch",
+    sc_img: "https://i1.sndcdn.com/artworks-M5uSWvVQOlPTTvhs-aFPbgA-t500x500.jpg",
+    url: "https://soundcloud.com/user-773777360/ugng4-2",
+    bio: "Electronic music exploration. Two Player architecture test track #1."
   },
   {
-    sc_title: "Larry Levan - Paradise Garage 1979",
-    user_name: "Mihai DL",
-    sc_img: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDMwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjNEVDREM0Ii8+Cjx0ZXh0IHg9IjE1MCIgeT0iMTQwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iMC4zZW0iPkxhcnJ5IExldmFuPC90ZXh0Pjx0ZXh0IHg9IjE1MCIgeT0iMTYwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iMC4zZW0iPkdhcmFnZSBDbGFzc2ljPC90ZXh0Pjwvc3ZnPg==",
-    url: "https://soundcloud.com/mihaidl/larry-levan-paradise-garage-1979",
-    bio: "Classic garage house set from Paradise Garage. Two Player architecture test track #2."
+    sc_title: "BLUE FICTION /DECONSTRUCTION by IORI",
+    user_name: "Iori",
+    sc_img: "https://i1.sndcdn.com/artworks-4YCYH28DXVYwuhZZ-ttxyIg-t500x500.jpg",
+    url: "https://soundcloud.com/iori927/deconstructionmaster",
+    bio: "Experimental deconstruction of sound. Two Player architecture test track #2."
   },
   {
-    sc_title: "Nicky Siano Live at The Gallery II Opening 1974",
-    user_name: "THUMP",
-    sc_img: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDMwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjNDVCN0QxIi8+Cjx0ZXh0IHg9IjE1MCIgeT0iMTQwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iMC4zZW0iPk5pY2t5IFNpYW5vPC90ZXh0Pjx0ZXh0IHg9IjE1MCIgeT0iMTYwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iMC4zZW0iPkdhbGxlcnkgSUk8L3RleHQ+PC9zdmc+",
-    url: "https://soundcloud.com/thump/nicky-siano-live-at-the-gallery-ii-opening-1974",
-    bio: "Historic disco set from The Gallery II opening. Two Player architecture test track #3."
+    sc_title: "UGNG2 by Improper Touch",
+    user_name: "Impropertouch",
+    sc_img: "https://i1.sndcdn.com/artworks-yzVPHFegVJUjy85R-ydfzNg-t500x500.jpg",
+    url: "https://soundcloud.com/user-773777360/ugng2",
+    bio: "Deep electronic journey. Two Player architecture test track #3."
   },
   {
-    sc_title: "Bobby Konders Mix",
-    user_name: "DJ M-TRAXXX",
-    sc_img: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDMwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjOTZDRUI0Ii8+Cjx0ZXh0IHg9IjE1MCIgeT0iMTQwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iMC4zZW0iPkJvYmJ5IEtvbmRlcnM8L3RleHQ+Cjx0ZXh0IHg9IjE1MCIgeT0iMTYwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iMC4zZW0iPk55YyBIb3VzZTwvdGV4dD48L3N2Zz4=",
-    url: "https://soundcloud.com/djmtraxxx/bobbykonders",
-    bio: "NYC house classics mix. Two Player architecture test track #4."
+    sc_title: "Carolina Soul: Afro-Soul-Funk Rarities 250725",
+    user_name: "NTS Radio",
+    sc_img: "https://i1.sndcdn.com/artworks-FdtpyOsG8kq9mCDz-asGpLw-t500x500.jpg",
+    url: "https://soundcloud.com/user-643553014/carolina-soul-afro-soul-funk",
+    bio: "Rare soul and funk selections. Two Player architecture test track #4."
   }
 ]
 

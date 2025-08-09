@@ -9,6 +9,103 @@
 
 ---
 
+## 🍎 Safari Audio Playback - CRITICAL IMPLEMENTATION
+
+### ⚠️ 必須実装: Safari初回再生バウンス問題の対応
+SafariブラウザはSoundCloud Widget APIの初回再生時に特殊な動作を示します。Widget が完全に初期化される前に`play()`を呼ぶと、一瞬再生してすぐ停止する「bounce」現象が発生します。
+
+**絶対にスキップしてはいけない実装項目です。**
+
+### 実装が必要な理由
+- Safari（iOS含む）でのみ発生する固有の問題
+- 通常の`play()`メソッドでは解決不可能
+- この対応なしではSafariユーザーが音楽を再生できない
+
+### 必須実装要素
+
+#### 1. 追加状態管理
+```typescript
+const [isInitialized, setIsInitialized] = useState(false)
+const initClickedRef = useRef(false)
+```
+
+#### 2. Safari専用初期化関数
+```typescript
+const initializeAndPlay = useCallback(() => {
+  if (!playerRef.current?.widget || !isReady || initClickedRef.current) return
+  
+  console.log('Initializing and playing...')
+  initClickedRef.current = true
+  
+  // Safari対応: seekTo(0)を呼んでから再生
+  playerRef.current.widget.seekTo(0)
+  
+  setTimeout(() => {
+    playerRef.current.widget.play()
+    
+    // さらに少し待ってから状態をチェック
+    setTimeout(() => {
+      playerRef.current.widget.isPaused((paused: boolean) => {
+        if (paused) {
+          // まだ一時停止中なら、もう一度試す
+          playerRef.current.widget.play()
+        }
+      })
+    }, 300)
+  }, 100)
+}, [isReady])
+```
+
+#### 3. togglePlay関数の初回処理
+```typescript
+// 初回クリック時の特別処理
+if (!isInitialized && !initClickedRef.current) {
+  initializeAndPlay()
+  return
+}
+```
+
+#### 4. 必要な状態リセット処理
+- 新規プレイヤー作成時:
+  ```typescript
+  if (isNew) {
+    setIsInitialized(false)
+    initClickedRef.current = false
+    // ...
+  }
+  ```
+- プレイヤー削除時:
+  ```typescript
+  setIsInitialized(false)
+  initClickedRef.current = false
+  ```
+- PLAY イベント時:
+  ```typescript
+  widget.bind(window.SC.Widget.Events.PLAY, () => {
+    setIsInitialized(true) // 初期化完了をマーク
+    // ...
+  })
+  ```
+
+### 実装チェックリスト（絶対に全て実装すること）
+- [x] `initClickedRef` の追加
+- [x] `isInitialized` ステートの追加  
+- [x] `initializeAndPlay` 関数の実装
+- [x] `togglePlay` での初回処理分岐
+- [x] 新規プレイヤー作成時のリセット
+- [x] プレイヤー削除時のリセット
+- [x] PLAY イベントでの初期化完了マーク
+
+### Safari問題の技術的詳細
+1. **原因**: SoundCloud Widget APIの初期化タイミングとSafariの音声再生ポリシーの競合
+2. **症状**: 初回クリック時に再生が一瞬始まってすぐ停止する
+3. **解決**: `seekTo(0)`による確実なWidget初期化 + 段階的な再生試行
+4. **検証**: 実際のSafariブラウザでの動作確認が必須
+
+**注意**: この実装はSafariユーザー体験の根幹に関わります。絶対にスキップまたは簡略化しないこと。
+
+---
+
 ## 🔧 重要な技術実装ポイント
 
 ### 1. グローバルトラックとローカルトラックの完全分離
@@ -249,6 +346,7 @@ if (!globalModalVisible || !globalCurrentTrack) {
 - ✅ **React Hooks Compliance**: 全ルール準拠の安全な実装
 - ✅ **Glass Morphism UI**: 現代的で統一されたデザイン
 - ✅ **Z-Index Management**: 階層化されたUI要素管理
+- ✅ **Safari Audio Compatibility**: 🍎 初回再生バウンス問題の完全解決
 
 ### React版からの主要改善点:
 1. **Next.js App Router**: Server Components + Client Componentsの適切な分離
@@ -258,6 +356,7 @@ if (!globalModalVisible || !globalCurrentTrack) {
 5. **アクセシビリティ**: Z-index管理による操作性向上
 6. **モバイル対応**: 完全なタッチ操作サポート
 7. **デバッグ機能**: 開発効率向上のための包括的な状態表示
+8. **🍎 Safari対応**: 初回再生バウンス問題の根本解決による完全なブラウザ互換性
 
 ---
 

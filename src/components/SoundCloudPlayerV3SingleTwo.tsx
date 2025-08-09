@@ -39,6 +39,7 @@ const SoundCloudPlayerV3SingleTwo: React.FC<SoundCloudPlayerV3SingleTwoProps> = 
     globalCurrentTime,
     setLocalModalOpen,
     globalToggleLike,
+    globalTogglePlay,
     globalSeekTo,
   } = useTwoPlayer()
 
@@ -52,10 +53,12 @@ const SoundCloudPlayerV3SingleTwo: React.FC<SoundCloudPlayerV3SingleTwoProps> = 
   const [showMiniPlayer, setShowMiniPlayer] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
   const [dragTime, setDragTime] = useState(0)
+  const [isInitialized, setIsInitialized] = useState(false)
   
   // seek実行後の短期間自動更新を抑制するためのref
   const seekTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const playerRef = useRef<any>(null)
+  const initClickedRef = useRef(false)
 
   // このトラックがグローバルに再生中かチェック
   const isGlobalTrack = globalCurrentTrack?.url === url
@@ -97,6 +100,7 @@ const SoundCloudPlayerV3SingleTwo: React.FC<SoundCloudPlayerV3SingleTwoProps> = 
 
     widget.bind(window.SC.Widget.Events.PLAY, () => {
       setIsPlaying(true)
+      setIsInitialized(true)
       markPlayerAsPlayed(url, trackInfo)
       setShowMiniPlayer(true)
     })
@@ -133,6 +137,10 @@ const SoundCloudPlayerV3SingleTwo: React.FC<SoundCloudPlayerV3SingleTwoProps> = 
       playerRef.current = player
       
       if (isNew) {
+        setIsInitialized(false)
+        initClickedRef.current = false
+        setCurrentTime(0)
+        setDuration(0)
         if (window.SC) {
           setupWidget()
         } else {
@@ -164,15 +172,54 @@ const SoundCloudPlayerV3SingleTwo: React.FC<SoundCloudPlayerV3SingleTwoProps> = 
     onModalClose(url)
   }, [url, onModalClose, setLocalModalOpen])
 
+  // Safari対応の初期化関数
+  const initializeAndPlay = useCallback(() => {
+    if (!playerRef.current?.widget || !isReady || initClickedRef.current) return
+    
+    console.log('Initializing and playing...')
+    initClickedRef.current = true
+    
+    // Safari対応: seekTo(0)を呼んでから再生
+    playerRef.current.widget.seekTo(0)
+    
+    setTimeout(() => {
+      playerRef.current.widget.play()
+      
+      // さらに少し待ってから状態をチェック
+      setTimeout(() => {
+        playerRef.current.widget.isPaused((paused: boolean) => {
+          console.log('After init - isPaused:', paused)
+          if (paused) {
+            // まだ一時停止中なら、もう一度試す
+            playerRef.current.widget.play()
+          }
+        })
+      }, 300)
+    }, 100)
+  }, [isReady])
+
   const togglePlay = useCallback(() => {
+    // グローバルトラックの場合はグローバル関数を使用
+    if (isGlobalTrack) {
+      globalTogglePlay()
+      return
+    }
+
     if (!playerRef.current?.widget || !isReady) return
 
+    // 初回クリック時の特別処理
+    if (!isInitialized && !initClickedRef.current) {
+      initializeAndPlay()
+      return
+    }
+
+    // 通常の再生/一時停止
     if (displayIsPlaying) {
       playerRef.current.widget.pause()
     } else {
       playerRef.current.widget.play()
     }
-  }, [displayIsPlaying, isReady])
+  }, [displayIsPlaying, isReady, isInitialized, initializeAndPlay, isGlobalTrack, globalTogglePlay])
 
   const toggleLike = useCallback(() => {
     if (isGlobalTrack) {
@@ -344,6 +391,8 @@ const SoundCloudPlayerV3SingleTwo: React.FC<SoundCloudPlayerV3SingleTwoProps> = 
         setIsPlaying(false)
         setCurrentTime(0)
         setShowMiniPlayer(false)
+        setIsInitialized(false)
+        initClickedRef.current = false
         playerRef.current = null
       }
     }

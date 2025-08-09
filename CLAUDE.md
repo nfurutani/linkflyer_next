@@ -11,6 +11,12 @@
    - 完了項目を✅に変更し、次のPhaseを現在実行中に変更する
    - ユーザーに言われる前に自動的に更新すること
 
+3. **🍎 Safari Audio再生の実装は絶対にスキップしない - CRITICAL**
+   - Safari browser特有のSoundCloud Widget APIの初回再生バウンス問題
+   - `initializeAndPlay`関数による初期化処理は必須実装項目
+   - この実装なしではSafariで音楽プレイヤーが正常動作しない
+   - React版からNext.js版への移行時に必ず含めること
+
 ## Overview
 LinkFlyer NextはReact版からNext.js 14 App Routerへの移行プロジェクトです。SSR/SSGの利点を活かしつつ、SoundCloud Widget APIを使用したグローバル音楽再生機能を実装し、パフォーマンスとSEOを向上させます。
 
@@ -458,6 +464,71 @@ export async function generateMetadata({
 - Rate limiting on API endpoints
 - Input sanitization
 - SQL injection prevention via Supabase
+
+## 🍎 Safari Audio Playback - CRITICAL IMPLEMENTATION
+
+### 必須実装: Safari初回再生バウンス問題の対応
+SafariブラウザはSoundCloud Widget APIの初回再生時に特殊な動作を示します。Widget が完全に初期化される前に`play()`を呼ぶと、一瞬再生してすぐ停止する「bounce」現象が発生します。
+
+### 必須実装要素（絶対にスキップ禁止）
+
+#### 1. 状態管理の追加
+```typescript
+const [isInitialized, setIsInitialized] = useState(false)
+const initClickedRef = useRef(false)
+```
+
+#### 2. Safari専用初期化関数
+```typescript
+const initializeAndPlay = useCallback(() => {
+  if (!playerRef.current?.widget || !isReady || initClickedRef.current) return
+  
+  console.log('Initializing and playing...')
+  initClickedRef.current = true
+  
+  // Safari対応: seekTo(0)を呼んでから再生
+  playerRef.current.widget.seekTo(0)
+  
+  setTimeout(() => {
+    playerRef.current.widget.play()
+    
+    // さらに少し待ってから状態をチェック
+    setTimeout(() => {
+      playerRef.current.widget.isPaused((paused: boolean) => {
+        if (paused) {
+          // まだ一時停止中なら、もう一度試す
+          playerRef.current.widget.play()
+        }
+      })
+    }, 300)
+  }, 100)
+}, [isReady])
+```
+
+#### 3. togglePlay関数の初回処理
+```typescript
+// 初回クリック時の特別処理
+if (!isInitialized && !initClickedRef.current) {
+  initializeAndPlay()
+  return
+}
+```
+
+#### 4. 状態リセット処理
+- 新しいプレイヤー作成時: `setIsInitialized(false)`, `initClickedRef.current = false`
+- プレイヤー削除時: 同様にリセット
+- PLAY イベント時: `setIsInitialized(true)`
+
+### 実装チェックリスト
+- [ ] `initClickedRef` の追加
+- [ ] `isInitialized` ステートの追加
+- [ ] `initializeAndPlay` 関数の実装
+- [ ] `togglePlay` での初回処理分岐
+- [ ] 新規プレイヤー作成時のリセット
+- [ ] プレイヤー削除時のリセット
+- [ ] PLAY イベントでの初期化完了マーク
+
+⚠️ **警告**: この実装なしではSafariユーザーが音楽を正常に再生できません。React版からNext.js版への移行時に必ず含めること。
 
 ## Monitoring & Analytics
 - Vercel Analytics for performance
