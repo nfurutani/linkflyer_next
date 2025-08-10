@@ -412,13 +412,43 @@ const SoundCloudPlayerV3SingleTwo: React.FC<SoundCloudPlayerV3SingleTwoProps> = 
         className="relative cursor-pointer"
         onClick={openModal}
       >
-        <Image
-          src={sc_img}
-          alt={sc_title}
-          width={300}
-          height={300}
-          className="w-full aspect-square object-cover rounded-lg"
-        />
+        <div className="relative">
+          <Image
+            src={sc_img}
+            alt={sc_title}
+            width={300}
+            height={300}
+            className="w-full aspect-square object-cover rounded-lg"
+          />
+          
+          {/* 再生中のインディケータ */}
+          {displayIsPlaying && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-lg">
+              <div className="flex items-end space-x-1">
+                <div className="w-1 bg-white rounded-full sound-wave" style={{height: '20px', animationDelay: '0s'}}></div>
+                <div className="w-1 bg-white rounded-full sound-wave" style={{height: '32px', animationDelay: '0.1s'}}></div>
+                <div className="w-1 bg-white rounded-full sound-wave" style={{height: '16px', animationDelay: '0.2s'}}></div>
+                <div className="w-1 bg-white rounded-full sound-wave" style={{height: '28px', animationDelay: '0.3s'}}></div>
+                <div className="w-1 bg-white rounded-full sound-wave" style={{height: '24px', animationDelay: '0.4s'}}></div>
+              </div>
+            </div>
+          )}
+          
+          <style jsx>{`
+            .sound-wave {
+              animation: soundWave 1s ease-in-out infinite alternate;
+            }
+            
+            @keyframes soundWave {
+              0% {
+                transform: scaleY(1);
+              }
+              100% {
+                transform: scaleY(0.3);
+              }
+            }
+          `}</style>
+        </div>
         
         <div className="mt-2">
           <h3 className="font-semibold text-sm line-clamp-1 text-gray-600">{sc_title}</h3>

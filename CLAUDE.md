@@ -45,59 +45,51 @@ LinkFlyer NextはReact版からNext.js 14 App Routerへの移行プロジェク�
 ## Project Structure
 ```
 linkflyer_next/
-├── app/
-│   ├── layout.tsx                      # Root layout with providers
-│   ├── page.tsx                        # Home page
-│   ├── auth/
-│   │   └── page.tsx                    # Authentication page
-│   ├── admin/
-│   │   ├── layout.tsx                  # Admin layout with protection
-│   │   ├── page.tsx                    # Admin dashboard
-│   │   ├── edit/page.tsx               # Profile editing
-│   │   ├── social/page.tsx             # Social links management
-│   │   ├── audio/page.tsx              # Audio management
-│   │   └── flyers/page.tsx             # Flyers management
-│   ├── [username]/
-│   │   └── page.tsx                    # Public user profile
-│   ├── flyers/
-│   │   └── [id]/page.tsx               # Flyer detail page
-│   ├── api/
-│   │   ├── auth/[...supabase]/route.ts # Supabase auth handler
-│   │   └── soundcloud/route.ts         # SoundCloud API proxy
-│   └── global.css                      # Global styles
-├── components/
-│   ├── providers/
-│   │   ├── TwoPlayerProvider.tsx       # Global player state
-│   │   └── SupabaseProvider.tsx        # Supabase client provider
-│   ├── audio/
-│   │   ├── SoundCloudPlayerV3.tsx      # Individual track player
-│   │   ├── GlobalMiniPlayer.tsx        # Persistent mini player
-│   │   ├── GlobalModal.tsx             # Full-screen modal
-│   │   └── TrackImage.tsx              # Track artwork component
-│   ├── ui/
-│   │   ├── Button.tsx                  # Reusable button
-│   │   ├── Input.tsx                   # Form input
-│   │   └── Modal.tsx                   # Modal wrapper
-│   └── layout/
-│       ├── Header.tsx                  # App header
-│       └── Footer.tsx                  # App footer
+├── src/
+│   └── app/
+│       ├── layout.tsx                      # Root layout with providers
+│       ├── page.tsx                        # Home redirect page
+│       ├── [username]/
+│       │   ├── page.tsx                    # Dynamic user profile (Server Component)
+│       │   └── ProfileClient.tsx           # Profile UI (Client Component)
+│       ├── auth/
+│       │   └── page.tsx                    # Authentication page (未実装)
+│       ├── admin/
+│       │   ├── layout.tsx                  # Admin layout with protection (未実装)
+│       │   ├── page.tsx                    # Admin dashboard (未実装)
+│       │   ├── edit/page.tsx               # Profile editing (未実装)
+│       │   ├── social/page.tsx             # Social links management (未実装)
+│       │   ├── audio/page.tsx              # Audio management (未実装)
+│       │   └── flyers/page.tsx             # Flyers management (未実装)
+│       ├── flyers/
+│       │   └── [id]/page.tsx               # Flyer detail page (未実装)
+│       ├── api/
+│       │   ├── auth/[...supabase]/route.ts # Supabase auth handler (未実装)
+│       │   └── soundcloud/route.ts         # SoundCloud API proxy (未実装)
+│       ├── globals.css                     # Global styles
+│       └── components/
+│           ├── SoundCloudPlayerV3SingleTwo.tsx  # Individual track player
+│           ├── GlobalMiniPlayer.tsx        # Persistent mini player
+│           ├── GlobalModal.tsx             # Full-screen modal
+│           ├── DebugInfo.tsx               # Debug information component
+│           └── providers/
+│               └── TwoPlayerProvider.tsx   # Global player state
 ├── lib/
 │   ├── supabase/
-│   │   ├── client.ts                   # Client-side Supabase
-│   │   ├── server.ts                   # Server-side Supabase
-│   │   └── middleware.ts               # Auth middleware
-│   ├── utils/
-│   │   └── soundcloud.ts               # SoundCloud utilities
-│   └── types/
-│       └── database.ts                 # Database types
+│   │   ├── client.ts                       # Client-side Supabase
+│   │   └── queries.ts                      # Database query functions
+│   └── utils/
+│       └── dataTransform.ts                # Data transformation utilities
+├── types/
+│   └── database.ts                         # Database type definitions
 ├── public/
-│   ├── icons/                          # Social media SVGs
-│   └── manifest.json                   # PWA manifest
-├── middleware.ts                       # Next.js middleware
-├── next.config.js                      # Next.js configuration
-├── tailwind.config.ts                  # Tailwind configuration
-├── tsconfig.json                       # TypeScript configuration
-└── .env.local                          # Environment variables
+│   ├── icons/                              # Social media SVG icons
+│   └── iori_asano-profile.jpg              # Profile image
+├── middleware.ts                           # Next.js middleware (未実装)
+├── next.config.js                          # Next.js configuration
+├── tailwind.config.ts                      # Tailwind configuration
+├── tsconfig.json                           # TypeScript configuration
+└── .env.local                              # Environment variables
 ```
 
 ## Key Differences from React Version
@@ -127,27 +119,33 @@ linkflyer_next/
 - [x] Touch操作完全対応
 - [x] Glass Morphismデザイン統一
 
-### Phase 1: 追加ページ実装 (未着手)
-- [ ] HomePage implementation
-- [ ] UserProfilePage with [username] routing
+### Phase 1: Supabase連携とプロファイルページ実装 ✅
+- [x] Supabase client configuration
+- [x] Database type definitions (Profile, Audio, Flyer)
+- [x] Query functions (getProfileByUsername, getAudioTracksByUserId, getFlyersByUserId)
+- [x] Data transformation utilities (SoundCloudTrack format)
+- [x] Dynamic [username] routing implementation
+- [x] ProfileClient component (Server/Client Components separation)
+- [x] Audio tracks display with Supabase data
+- [x] Flyers display with縦長レイアウト and オーバーレイ情報
+- [x] 再生中インディケータ (音波アニメーション)
+- [x] Home page redirect (/ → /naof219)
+
+### Phase 2: 追加機能実装 (未着手)
 - [ ] Admin dashboard pages
 - [ ] Authentication page with Supabase Auth
 - [ ] Flyer detail pages
+- [ ] User profile editing functionality
+- [ ] Audio/Flyer upload functionality
 
-### Phase 2: API/データ連携実装 (未着手) 
-- [ ] Set up Supabase client/server instances
-- [ ] Database integration
-- [ ] Image upload API routes
-- [ ] Authentication flow implementation
-- [ ] Data persistence layer
-
-### Phase 4: API & Server Functions
+### Phase 3: API & Server Functions (未着手)
 - [ ] SoundCloud oEmbed API proxy route
 - [ ] Image upload API endpoints
+- [ ] Authentication API routes
 - [ ] Database query optimizations
 - [ ] Edge function for auth checks
 
-### Phase 5: Features & Optimization
+### Phase 4: Features & Optimization (未着手)
 - [ ] PWA configuration
 - [ ] Service Worker setup
 - [ ] Image optimization with Next/Image
@@ -614,8 +612,13 @@ if (!isInitialized && !initClickedRef.current) {
 - **新ルール**: React版にない設定を追加する際は必ず事前承認を得る（CRITICAL RULES #4）
 
 ## Notes
-- **Phase 0のみ完了**: 音楽プレイヤーシステムの実装のみ
+- **Phase 0・1完了**: 音楽プレイヤーシステム + Supabaseデータ連携 + プロファイルページ実装完了
 - React版と100%同等の音楽再生機能とユーザー体験を実現
 - Safari含む全ブラウザでの音楽プレイヤー動作確認済み
-- **Phase 1・2は未着手**: ページ実装やAPI/データ連携は全く実装されていない
-- 音楽プレイヤー部分のみ完全実装済み
+- **完全実装済み機能**:
+  - SoundCloud Widget APIによる音楽再生（Two Player Architecture）
+  - Supabaseからのプロファイル・オーディオ・フライヤーデータ取得
+  - 動的ルーティング（/[username]）によるプロファイルページ
+  - 縦長フライヤー表示とオーバーレイ情報
+  - 再生中トラックの音波アニメーションインディケータ
+- **Phase 2以降は未着手**: 管理画面、認証、詳細ページなどの追加機能
