@@ -17,6 +17,15 @@
    - この実装なしではSafariで音楽プレイヤーが正常動作しない
    - React版からNext.js版への移行時に必ず含めること
 
+4. **React版にない設定を追加する際は必ず事前承認を得る - MANDATORY**
+   - linkflyer_reactリポジトリを参照し、既存の実装を確認する
+   - React版にない新しいCSS設定、JavaScript機能、HTML構造を追加する場合は必ずユーザーの承認を得る
+   - 特に以下の変更は要注意：
+     - グローバルCSS（html, body要素への設定）
+     - overflow、height、positionなどのレイアウト影響設定
+     - iOS Safari特有の挙動に関わる設定
+   - 承認なしに追加した場合は即座に元に戻すこと
+
 ## Overview
 LinkFlyer NextはReact版からNext.js 14 App Routerへの移行プロジェクトです。SSR/SSGの利点を活かしつつ、SoundCloud Widget APIを使用したグローバル音楽再生機能を実装し、パフォーマンスとSEOを向上させます。
 
@@ -554,6 +563,7 @@ if (!isInitialized && !initClickedRef.current) {
 ## 🎯 Phase 0 完了: Audio実装 + 動作確認
 **実装完了日**: 2025-08-07  
 **ステータス**: ✅ 完了済み
+**最終更新日**: 2025-08-10
 
 ### 主要実装成果
 1. **Safari Audio互換性**: 初回再生バウンス問題の完全解決
@@ -580,6 +590,28 @@ if (!isInitialized && !initClickedRef.current) {
 - **開発体験**: 包括的なデバッグ機能
 - **パフォーマンス**: Position polling最適化
 - **アクセシビリティ**: より良いキーボード/タッチ対応
+
+## 📝 2025-08-10 追加修正内容
+
+### 1. Global Mini Player表示問題の修正
+- **問題**: タブ切り替え時の初期表示不具合、スクロール時の沈み込み
+- **原因**: CSS設定の不完全な移植
+- **解決策**: 
+  - React版の`soundcloud-miniplayer-v3`クラスを`.global-mini-player-fixed`として完全移植
+  - `position: fixed !important`など、全ての重要な設定を適用
+  - GPU accelerationとレンダリング最適化を追加
+
+### 2. iOS Safari URLバー問題の解決
+- **問題**: スクロール時にURLバーが自動非表示にならない
+- **原因**: React版にない`height: 100%`と`overflow-x: hidden`を追加していた
+- **解決策**: React版と同じシンプルな設定に戻す（bodyの`margin: 0`のみ）
+
+### 3. Debug Info位置調整
+- **問題**: Debug InfoがModalの操作を妨げていた
+- **解決策**: 50px上に移動（top: 70px → 20px）
+
+### 4. 開発ルールの追加
+- **新ルール**: React版にない設定を追加する際は必ず事前承認を得る（CRITICAL RULES #4）
 
 ## Notes
 - **Phase 0のみ完了**: 音楽プレイヤーシステムの実装のみ

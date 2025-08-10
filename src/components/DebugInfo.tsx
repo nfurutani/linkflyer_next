@@ -64,7 +64,7 @@ const DebugInfo: React.FC = () => {
     <div 
       style={{
         position: 'fixed',
-        top: '70px',
+        top: '20px', // 70px → 20px (50px上に移動)
         right: '10px',
         backgroundColor: 'rgba(0, 0, 0, 0.9)',
         color: '#00ff00',

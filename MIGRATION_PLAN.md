@@ -1,19 +1,37 @@
 # LinkFlyer Next - Migration Plan & Key Implementation Points
 
-## 🚀 Migration Status: Phase 2 完全完了
+## 🚀 Migration Status: Phase 0 完全完了
 
-### Phase 2: Core Components Migration ✅
-**Status: COMPLETED** (2025-08-09)
+### Phase 0: Audio実装 + 動作確認 ✅
+**Status: COMPLETED** (2025-08-07)
+**最終更新**: 2025-08-10
 
 音楽プレイヤーシステムの完全実装が完了しました。React版からの移行で発生した技術的課題を全て解決し、Next.js環境での安定動作を実現しました。
 
-#### 🎯 最終セッションで完了した項目
+#### 🎯 2025-08-09 完了項目
 - **Global Mini Player デザイン統一**: React版と100%同一のビジュアル実現
 - **Progress Bar 位置調整**: 上部2pxバーの完全一致
 - **グラデーション効果**: `linear-gradient(90deg, #ffc7b4 0%, #ff6b35 100%)`の適用
 - **Z-Index 最適化**: 10001による最上位レイヤー配置
 - **SVG アイコン統一**: React版と同一のパスとサイズ
 - **最終検証**: 全ての視覚的・機能的差異の解消確認
+
+#### 🔧 2025-08-10 追加修正
+1. **Global Mini Player iOS Safari対応**
+   - スクロール時の沈み込み問題を解決
+   - React版の`soundcloud-miniplayer-v3`クラスを完全移植
+   - `.global-mini-player-fixed`クラスで`position: fixed !important`を適用
+
+2. **URLバー自動非表示の復活**
+   - React版にない`height: 100%`と`overflow-x: hidden`を削除
+   - iOS Safariの標準動作を妨げる設定を除去
+
+3. **Debug Info位置調整**
+   - Modal操作を妨げないよう50px上に移動（top: 70px → 20px）
+
+4. **開発ルールの強化**
+   - React版にない設定追加時の事前承認ルールを制定
+   - CLAUDE.mdのCRITICAL RULES #4として明文化
 
 ---
 

@@ -30,7 +30,7 @@ const GlobalMiniPlayer: React.FC = () => {
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-[10001]" style={{ boxShadow: '0 -2px 8px rgba(0, 0, 0, 0.1)' }}>
+    <div className="global-mini-player-fixed bg-white border-t border-gray-200" style={{ boxShadow: '0 -2px 8px rgba(0, 0, 0, 0.1)' }}>
       {/* Progress Bar at the top */}
       <div className="absolute top-0 left-0 w-full h-[2px] bg-gray-200">
         <div 
