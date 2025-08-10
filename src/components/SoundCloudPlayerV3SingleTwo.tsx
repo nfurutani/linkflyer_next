@@ -421,7 +421,7 @@ const SoundCloudPlayerV3SingleTwo: React.FC<SoundCloudPlayerV3SingleTwoProps> = 
         />
         
         <div className="mt-2">
-          <h3 className="font-semibold text-sm line-clamp-1">{sc_title}</h3>
+          <h3 className="font-semibold text-sm line-clamp-1 text-gray-600">{sc_title}</h3>
           <p className="text-gray-600 text-xs line-clamp-1">{user_name}</p>
         </div>
       </div>
@@ -490,9 +490,10 @@ const SoundCloudPlayerV3SingleTwo: React.FC<SoundCloudPlayerV3SingleTwoProps> = 
                     onTouchEnd={handleProgressBarTouchEnd}
                   >
                     <div 
-                      className="h-full bg-gradient-to-r from-orange-400 to-orange-600 rounded-full"
+                      className="h-full rounded-full"
                       style={{ 
                         width: `${displayDuration > 0 ? (displayCurrentTime / displayDuration) * 100 : 0}%`,
+                        background: 'linear-gradient(90deg, #ffc7b4 0%, #ff6b35 100%)',
                         transition: isDragging ? 'none' : 'width 0.1s ease'
                       }}
                     />
