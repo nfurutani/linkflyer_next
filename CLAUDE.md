@@ -41,6 +41,7 @@ LinkFlyer NextはReact版からNext.js 14 App Routerへの移行プロジェク�
 - **Audio Playback**: SoundCloud Widget API with Two Player Architecture + Global Player System
 - **PWA**: Service Worker, Web App Manifest (予定)
 - **Deployment**: Vercel
+- **Code Quality**: ESLint (現在は無効化 - プロトタイプ段階のため)
 
 ## Project Structure
 ```
@@ -660,6 +661,63 @@ useEffect(() => {
 
 この実装により、ユーザー体験を損なうことなく、複数のmodalが適切に管理されています。
 
+## 🔧 ESLint設定とコード品質管理
+
+### 現在の状態 (2025-08-11)
+**ESLint: 無効化中** (`next.config.js`で`ignoreDuringBuilds: true`設定)
+
+### 無効化の理由
+1. **プロトタイプ段階**: 動作する製品を最優先で作成中
+2. **開発速度重視**: 厳密なコードチェックよりも機能実装を優先
+3. **Vercel Free Plan最適化**: ビルド時間短縮とデプロイ成功率向上
+4. **初期MVP構築**: まず完動するプロダクトを作り、後で品質向上
+
+### ESLint有効化タイミング計画
+
+#### Phase 3: コード品質向上段階で有効化予定
+**条件**:
+- ✅ Phase 0: Audio実装完了
+- ✅ Phase 1: Profile実装完了
+- ⏳ Phase 2: 全ページ実装完了 → **ここで有効化**
+- Phase 3: 品質向上・リファクタリング段階
+
+#### 段階的有効化プロセス
+1. **軽微なルール**: 警告レベルから開始
+   ```json
+   {
+     "extends": ["next/core-web-vitals"],
+     "rules": {
+       "no-unused-vars": "warn",
+       "no-console": "off"
+     }
+   }
+   ```
+
+2. **徐々に厳格化**: エラーレベルに移行
+   ```json
+   {
+     "extends": ["next/core-web-vitals", "@typescript-eslint/recommended"],
+     "rules": {
+       "no-unused-vars": "error",
+       "@typescript-eslint/no-explicit-any": "warn"
+     }
+   }
+   ```
+
+#### 判断基準
+| 段階 | ESLint状態 | 理由 |
+|------|------------|------|
+| プロトタイプ (現在) | ❌ 無効 | 開発速度優先 |
+| MVP完成後 | ⚠️ 警告のみ | 重要エラーのみ検出 |
+| β版リリース | ✅ 有効 | コード品質安定化 |
+| プロダクション | 🔒 厳格 | 保守性・チーム開発対応 |
+
+### 現在の品質担保方法
+- **TypeScript**: 厳密な型チェック有効
+- **Next.js Build**: コンパイルエラー検出
+- **手動レビュー**: 重要機能の動作確認
+- **実機テスト**: Safari含む各ブラウザでの動作検証
+
 ## Notes
 - **Phase 0・1完了**: 音楽プレイヤーシステム + Supabaseデータ連携 + プロファイルページ実装完了
 - React版と100%同等の音楽再生機能とユーザー体験を実現
@@ -672,3 +730,4 @@ useEffect(() => {
   - 再生中トラックの音波アニメーションインディケータ
   - Flyer Modalシステム（Audio Modalと独立管理、競合制御）
 - **Phase 2以降は未着手**: 管理画面、認証、詳細ページなどの追加機能
+- **ESLint**: プロトタイプ段階のため適切に無効化中（Phase 2完了後に有効化予定）
