@@ -21,28 +21,29 @@ export default function FlyerModal({ flyer, isOpen, onClose }: FlyerModalProps) 
 
     if (isOpen) {
       document.addEventListener('keydown', handleEscKey)
-      // スクロールを無効にする
-      document.body.style.overflow = 'hidden'
+      // モーダル内でスクロールするため、bodyのスクロールは維持
     }
 
     return () => {
       document.removeEventListener('keydown', handleEscKey)
-      document.body.style.overflow = 'unset'
     }
   }, [isOpen, onClose])
 
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pb-20">
+    <div className="fixed inset-0 z-50 overflow-y-auto">
       {/* 背景オーバーレイ */}
       <div 
-        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+        className="fixed inset-0 bg-black/80 backdrop-blur-sm"
         onClick={onClose}
       />
       
-      {/* モーダルコンテンツ */}
-      <div className="relative w-full max-w-2xl max-h-full bg-white rounded-lg shadow-2xl flex flex-col overflow-hidden">
+      {/* スクロール可能なコンテナ */}
+      <div className="relative min-h-full flex items-start justify-center p-4 py-8 pb-24">
+        {/* モーダルコンテンツ */}
+        <div className="relative w-full max-w-2xl bg-white rounded-lg shadow-2xl"
+             onClick={(e) => e.stopPropagation()}>
         {/* 閉じるボタン - Audio local modalと同じデザイン */}
         <button
           onClick={onClose}
@@ -62,9 +63,7 @@ export default function FlyerModal({ flyer, isOpen, onClose }: FlyerModalProps) 
             <line x1="6" y1="6" x2="18" y2="18"></line>
           </svg>
         </button>
-        
-        {/* スクロール可能なコンテンツ */}
-        <div className="flex-1 overflow-y-auto">
+          
           {/* フライヤー画像 */}
           <div className="relative">
             <Image
@@ -72,14 +71,14 @@ export default function FlyerModal({ flyer, isOpen, onClose }: FlyerModalProps) 
               alt={flyer.title || 'Flyer'}
               width={800}
               height={1000}
-              className="w-full h-auto object-contain"
+              className="w-full h-auto object-contain rounded-t-lg"
               priority
             />
           </div>
           
           {/* フライヤー情報 */}
           {(flyer.title || flyer.description || flyer.event_date || flyer.venue_name || flyer.venue_address) && (
-            <div className="p-6 bg-white pb-24">
+            <div className="p-6 bg-white rounded-b-lg">
             {flyer.title && (
               <h2 className="text-2xl font-bold mb-3 text-gray-800">{flyer.title}</h2>
             )}
