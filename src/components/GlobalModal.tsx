@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useRef, useCallback, useEffect } from 'react'
+import React, { useState, useRef, useCallback } from 'react'
 import Image from 'next/image'
 import { useTwoPlayer } from './providers/TwoPlayerProvider'
 
@@ -22,8 +22,6 @@ const GlobalModal: React.FC = () => {
   const [dragTime, setDragTime] = useState(0)
   const progressBarRef = useRef<HTMLDivElement>(null)
 
-  // seek実行後の短期間自動更新を抑制するためのref
-  const seekTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
 
   const seekToPosition = useCallback((clientX: number, progressBarElement: HTMLElement, updateOnly = false) => {

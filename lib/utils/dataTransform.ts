@@ -9,10 +9,10 @@ export interface SoundCloudTrack {
   sc_img: string
   url: string
   title?: string
-  image_url?: string
-  profile_img?: string
-  bio?: string
-  shopLink?: string
+  image_url?: string | null
+  profile_img?: string | null
+  bio?: string | null
+  shopLink?: string | null
 }
 
 /**

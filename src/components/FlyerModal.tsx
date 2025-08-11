@@ -11,8 +11,6 @@ interface FlyerModalProps {
 }
 
 export default function FlyerModal({ flyer, isOpen, onClose }: FlyerModalProps) {
-  if (!isOpen) return null
-
   // ESCキーでモーダルを閉じる
   React.useEffect(() => {
     const handleEscKey = (event: KeyboardEvent) => {
@@ -32,6 +30,8 @@ export default function FlyerModal({ flyer, isOpen, onClose }: FlyerModalProps) 
       document.body.style.overflow = 'unset'
     }
   }, [isOpen, onClose])
+
+  if (!isOpen) return null
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">

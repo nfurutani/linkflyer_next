@@ -22,12 +22,6 @@ const GlobalMiniPlayer: React.FC = () => {
     return null
   }
 
-  // 時間をフォーマット
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60)
-    const secs = Math.floor(seconds % 60)
-    return `${mins}:${secs.toString().padStart(2, '0')}`
-  }
 
   return (
     <div className="global-mini-player-fixed bg-white border-t border-gray-200" style={{ boxShadow: '0 -2px 8px rgba(0, 0, 0, 0.1)' }}>

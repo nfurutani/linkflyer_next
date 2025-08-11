@@ -141,7 +141,7 @@ export default function TrendingPage() {
             <div>
               <h4 className="text-lg font-semibold text-gray-900 mb-3">📈 Why These Tracks?</h4>
               <ul className="space-y-2 text-gray-600">
-                <li>• High play-through rates (>80%)</li>
+                <li>• High play-through rates (&gt;80%)</li>
                 <li>• Rapid social media shares</li>
                 <li>• DJ playlist additions</li>
                 <li>• Underground blog features</li>

@@ -4,13 +4,13 @@ import { transformAudioArrayToSoundCloudTracks } from '../../../lib/utils/dataTr
 import ProfileClient from './ProfileClient'
 
 interface PageProps {
-  params: {
+  params: Promise<{
     username: string
-  }
+  }>
 }
 
 export default async function ProfilePage({ params }: PageProps) {
-  const { username } = params
+  const { username } = await params
   
   // Supabaseからユーザーデータを取得
   const { profile, audioTracks, flyers } = await getProfileWithAudioTracks(username)

@@ -15,10 +15,10 @@ interface TrackInfo {
   sc_img: string
   url: string
   title?: string
-  image_url?: string
-  profile_img?: string
-  bio?: string
-  shop_link?: string
+  image_url?: string | null
+  profile_img?: string | null
+  bio?: string | null
+  shop_link?: string | null
 }
 
 interface TwoPlayerContextType {
