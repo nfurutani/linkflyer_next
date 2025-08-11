@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
 import SoundCloudPlayerV3SingleTwo from '../../components/SoundCloudPlayerV3SingleTwo'
+import FlyerModal from '../../components/FlyerModal'
 import { SoundCloudTrack } from '../../../lib/utils/dataTransform'
 import { Flyer } from '../../../types/database'
 
@@ -32,6 +33,18 @@ interface ProfileClientProps {
 export default function ProfileClient({ profile, tracks, flyers }: ProfileClientProps) {
   const [activeTab, setActiveTab] = useState<'audio' | 'flyers'>('audio')
   const [svgIcons, setSvgIcons] = useState<Record<string, string>>({})
+  const [selectedFlyer, setSelectedFlyer] = useState<Flyer | null>(null)
+  const [isFlyerModalOpen, setIsFlyerModalOpen] = useState(false)
+
+  const handleFlyerClick = (flyer: Flyer) => {
+    setSelectedFlyer(flyer)
+    setIsFlyerModalOpen(true)
+  }
+
+  const handleCloseFlyerModal = () => {
+    setIsFlyerModalOpen(false)
+    setSelectedFlyer(null)
+  }
 
   // Load SVG icons
   useEffect(() => {
@@ -162,7 +175,11 @@ export default function ProfileClient({ profile, tracks, flyers }: ProfileClient
           <div className="grid grid-cols-2 gap-4 mb-20">
             {flyers.length > 0 ? (
               flyers.map((flyer, index) => (
-                <div key={flyer.id} className="relative cursor-pointer">
+                <div 
+                  key={flyer.id} 
+                  className="relative cursor-pointer"
+                  onClick={() => handleFlyerClick(flyer)}
+                >
                   <div className="relative">
                     <Image
                       src={flyer.image_url}
@@ -196,6 +213,15 @@ export default function ProfileClient({ profile, tracks, flyers }: ProfileClient
           </div>
         )}
       </div>
+      
+      {/* Flyer Modal - Audio modalとは独立して管理 */}
+      {selectedFlyer && (
+        <FlyerModal
+          flyer={selectedFlyer}
+          isOpen={isFlyerModalOpen}
+          onClose={handleCloseFlyerModal}
+        />
+      )}
     </div>
   )
 }
