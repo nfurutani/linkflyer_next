@@ -49,6 +49,13 @@ Supabaseデータベースとの連携機能およびlinkflyer_reactと同等の
    - 本番使用ファイルのみ保持
    - インポートパス修正
 
+7. **Flyer Modal System実装**
+   - 独立したFlyer Modal (`FlyerModal.tsx`)
+   - Audio Modalと分離された状態管理
+   - Modal競合制御（Global Modal優先）
+   - 統一されたUIデザイン（Close button等）
+   - フライヤー詳細情報表示機能
+
 #### 🎯 2025-08-09 完了項目（Phase 0継続）
 - **Global Mini Player デザイン統一**: React版と100%同一のビジュアル実現
 - **Progress Bar 位置調整**: 上部2pxバーの完全一致
@@ -73,6 +80,13 @@ Supabaseデータベースとの連携機能およびlinkflyer_reactと同等の
 4. **開発ルールの強化**
    - React版にない設定追加時の事前承認ルールを制定
    - CLAUDE.mdのCRITICAL RULES #4として明文化
+
+5. **Flyer Modal System実装 (2025-08-10)**
+   - フライヤー画像クリック時のModal表示機能
+   - Audio Modal（Global/Local）と独立したModal管理
+   - Modal競合制御: Global Modal表示時にFlyer Modal自動終了
+   - レスポンシブデザイン、キーボード操作対応
+   - フライヤー情報の詳細表示（日付、会場情報等）
 
 ---
 

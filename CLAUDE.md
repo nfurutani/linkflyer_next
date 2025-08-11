@@ -611,6 +611,55 @@ if (!isInitialized && !initClickedRef.current) {
 ### 4. 開発ルールの追加
 - **新ルール**: React版にない設定を追加する際は必ず事前承認を得る（CRITICAL RULES #4）
 
+## 🖼️ Flyer Modal System - Multi-Modal管理
+
+### Flyer Modal実装 (2025-08-10)
+プロファイルページのフライヤー表示機能として、独立したFlyer Modalシステムを実装しました。
+
+#### 主要機能
+1. **独立したModal管理**
+   - Audio系Modal（Global/Local Modal）とは完全分離
+   - 専用コンポーネント: `FlyerModal.tsx`
+   - ProfileClient内で状態管理
+
+2. **Modal競合制御**
+   - Global Modal表示時 → Flyer Modal自動で閉じる
+   - 複数modalの同時表示を防止
+   - Two Player Architectureの既存制御と統一
+
+3. **UIデザイン**
+   - Audio Local Modalと統一されたClose buttonデザイン
+   - 白い角丸コンテナ、背景ぼかし効果
+   - レスポンシブ対応、ESCキー/背景クリック対応
+
+4. **フライヤー情報表示**
+   - 大きなフライヤー画像表示
+   - タイトル、説明文
+   - イベント日付（英語形式、漢字なし）
+   - 会場名、住所（絵文字なし、シンプル表示）
+
+#### 技術実装
+```typescript
+// ProfileClient.tsx内での制御
+const { globalModalVisible } = useTwoPlayer()
+
+// Global Modalが開いたときにFlyer Modalを閉じる
+useEffect(() => {
+  if (globalModalVisible && isFlyerModalOpen) {
+    console.log('Closing flyer modal because global modal opened')
+    setIsFlyerModalOpen(false)
+    setSelectedFlyer(null)
+  }
+}, [globalModalVisible, isFlyerModalOpen])
+```
+
+#### Modal階層管理
+- **最優先**: Global Modal (z-index: 最高)
+- **次優先**: Local Modal (Audio用)
+- **その他**: Flyer Modal (Global Modalにより制御される)
+
+この実装により、ユーザー体験を損なうことなく、複数のmodalが適切に管理されています。
+
 ## Notes
 - **Phase 0・1完了**: 音楽プレイヤーシステム + Supabaseデータ連携 + プロファイルページ実装完了
 - React版と100%同等の音楽再生機能とユーザー体験を実現
@@ -621,4 +670,5 @@ if (!isInitialized && !initClickedRef.current) {
   - 動的ルーティング（/[username]）によるプロファイルページ
   - 縦長フライヤー表示とオーバーレイ情報
   - 再生中トラックの音波アニメーションインディケータ
+  - Flyer Modalシステム（Audio Modalと独立管理、競合制御）
 - **Phase 2以降は未着手**: 管理画面、認証、詳細ページなどの追加機能

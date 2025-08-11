@@ -6,6 +6,7 @@ import SoundCloudPlayerV3SingleTwo from '../../components/SoundCloudPlayerV3Sing
 import FlyerModal from '../../components/FlyerModal'
 import { SoundCloudTrack } from '../../../lib/utils/dataTransform'
 import { Flyer } from '../../../types/database'
+import { useTwoPlayer } from '../../components/providers/TwoPlayerProvider'
 
 // Define social platforms to display
 const socialPlatforms = [
@@ -31,6 +32,7 @@ interface ProfileClientProps {
 }
 
 export default function ProfileClient({ profile, tracks, flyers }: ProfileClientProps) {
+  const { globalModalVisible } = useTwoPlayer()
   const [activeTab, setActiveTab] = useState<'audio' | 'flyers'>('audio')
   const [svgIcons, setSvgIcons] = useState<Record<string, string>>({})
   const [selectedFlyer, setSelectedFlyer] = useState<Flyer | null>(null)
@@ -45,6 +47,15 @@ export default function ProfileClient({ profile, tracks, flyers }: ProfileClient
     setIsFlyerModalOpen(false)
     setSelectedFlyer(null)
   }
+
+  // Global Modalが開いたときにFlyer Modalを閉じる
+  useEffect(() => {
+    if (globalModalVisible && isFlyerModalOpen) {
+      console.log('Closing flyer modal because global modal opened')
+      setIsFlyerModalOpen(false)
+      setSelectedFlyer(null)
+    }
+  }, [globalModalVisible, isFlyerModalOpen])
 
   // Load SVG icons
   useEffect(() => {
