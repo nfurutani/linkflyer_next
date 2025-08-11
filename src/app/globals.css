@@ -6,6 +6,13 @@
   body {
     margin: 0;
     padding: 0;
+    /* Disable pull-to-refresh on mobile browsers */
+    overscroll-behavior-y: contain;
+  }
+  
+  /* Additional pull-to-refresh prevention */
+  html {
+    overscroll-behavior-y: contain;
   }
 }
 

@@ -6,6 +6,7 @@ import { TwoPlayerProvider } from '../components/providers/TwoPlayerProvider'
 import GlobalMiniPlayer from '../components/GlobalMiniPlayer'
 import GlobalModal from '../components/GlobalModal'
 import DebugInfo from '../components/DebugInfo'
+import DisablePullToRefresh from '../components/DisablePullToRefresh'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -27,6 +28,9 @@ export default function RootLayout({
           strategy="beforeInteractive"
         />
         <TwoPlayerProvider>
+          {/* Disable pull-to-refresh */}
+          <DisablePullToRefresh />
+          
           {/* Global player container for iframe management */}
           <div id="global-player-container" />
           
