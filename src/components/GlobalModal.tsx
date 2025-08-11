@@ -147,7 +147,7 @@ const GlobalModal: React.FC = () => {
           {/* アーティスト情報 */}
           <div className="text-center mb-8">
             {globalCurrentTrack.profile_img && (
-              <div className="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden border-4 border-white/20">
+              <div className="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden border border-white/20">
                 <Image
                   src={globalCurrentTrack.profile_img}
                   alt={globalCurrentTrack.user_name}
@@ -181,9 +181,10 @@ const GlobalModal: React.FC = () => {
                 onTouchEnd={handleProgressBarTouchEnd}
               >
                 <div 
-                  className="h-full bg-gradient-to-r from-orange-400 to-orange-600 rounded-full"
+                  className="h-full rounded-full"
                   style={{ 
                     width: `${globalDuration > 0 ? (displayCurrentTime / globalDuration) * 100 : 0}%`,
+                    background: 'linear-gradient(90deg, #ffc7b4 0%, #ff6b35 100%)',
                     transition: isDragging ? 'none' : 'width 0.1s ease'
                   }}
                 />
@@ -196,14 +197,24 @@ const GlobalModal: React.FC = () => {
 
             {/* コントロールボタン */}
             <div className="flex items-center justify-center space-x-6">
-              <button
+              <div 
+                role="button" 
+                tabIndex={0} 
+                className={`cursor-pointer p-1 ${globalIsLiked ? 'text-red-500' : 'text-gray-400'}`}
                 onClick={globalToggleLike}
-                className={`p-3 rounded-full transition-colors ${globalIsLiked ? 'text-red-500' : 'text-gray-400 hover:text-red-500'}`}
               >
-                <svg className="w-8 h-8" fill={globalIsLiked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                <svg 
+                  width="32" 
+                  height="32" 
+                  viewBox="0 0 24 24" 
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path 
+                    d="M10.763 6.335a4.25 4.25 0 0 0-6.01 6.01L12 19.593l6.54-6.54.708-.708a4.25 4.25 0 1 0-6.01-6.01l-.708.707a.75.75 0 0 1-1.06 0l-.707-.707Zm1.77 14.846a.75.75 0 0 1-1.063.003l-7.778-7.778a5.75 5.75 0 0 1 8.131-8.132l.177.177.177-.177a5.75 5.75 0 1 1 8.131 8.132l-7.775 7.775Z" 
+                    fill="currentColor"
+                  />
                 </svg>
-              </button>
+              </div>
 
               <button
                 onClick={globalTogglePlay}

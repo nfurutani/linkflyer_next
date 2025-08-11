@@ -50,7 +50,6 @@ const SoundCloudPlayerV3SingleTwo: React.FC<SoundCloudPlayerV3SingleTwoProps> = 
   const [isLiked, setIsLiked] = useState(false)
   const [duration, setDuration] = useState(0)
   const [currentTime, setCurrentTime] = useState(0)
-  const [showMiniPlayer, setShowMiniPlayer] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
   const [dragTime, setDragTime] = useState(0)
   const [isInitialized, setIsInitialized] = useState(false)
@@ -102,7 +101,6 @@ const SoundCloudPlayerV3SingleTwo: React.FC<SoundCloudPlayerV3SingleTwoProps> = 
       setIsPlaying(true)
       setIsInitialized(true)
       markPlayerAsPlayed(url, trackInfo)
-      setShowMiniPlayer(true)
     })
 
     widget.bind(window.SC.Widget.Events.PAUSE, () => {
@@ -390,7 +388,6 @@ const SoundCloudPlayerV3SingleTwo: React.FC<SoundCloudPlayerV3SingleTwoProps> = 
         setIsReady(false)
         setIsPlaying(false)
         setCurrentTime(0)
-        setShowMiniPlayer(false)
         setIsInitialized(false)
         initClickedRef.current = false
         playerRef.current = null
@@ -412,7 +409,7 @@ const SoundCloudPlayerV3SingleTwo: React.FC<SoundCloudPlayerV3SingleTwoProps> = 
     <>
       {/* メインプレイヤーボタン */}
       <div 
-        className="relative cursor-pointer group"
+        className="relative cursor-pointer"
         onClick={openModal}
       >
         <div className="relative">
@@ -423,19 +420,38 @@ const SoundCloudPlayerV3SingleTwo: React.FC<SoundCloudPlayerV3SingleTwoProps> = 
             height={300}
             className="w-full aspect-square object-cover rounded-lg"
           />
-          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 rounded-lg flex items-center justify-center">
-            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-              <div className="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center shadow-lg">
-                <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M8 5v14l11-7z"/>
-                </svg>
+          
+          {/* 再生中のインディケータ */}
+          {displayIsPlaying && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-lg">
+              <div className="flex items-end space-x-1">
+                <div className="w-1 bg-white rounded-full sound-wave" style={{height: '20px', animationDelay: '0s'}}></div>
+                <div className="w-1 bg-white rounded-full sound-wave" style={{height: '32px', animationDelay: '0.1s'}}></div>
+                <div className="w-1 bg-white rounded-full sound-wave" style={{height: '16px', animationDelay: '0.2s'}}></div>
+                <div className="w-1 bg-white rounded-full sound-wave" style={{height: '28px', animationDelay: '0.3s'}}></div>
+                <div className="w-1 bg-white rounded-full sound-wave" style={{height: '24px', animationDelay: '0.4s'}}></div>
               </div>
             </div>
-          </div>
+          )}
+          
+          <style jsx>{`
+            .sound-wave {
+              animation: soundWave 1s ease-in-out infinite alternate;
+            }
+            
+            @keyframes soundWave {
+              0% {
+                transform: scaleY(1);
+              }
+              100% {
+                transform: scaleY(0.3);
+              }
+            }
+          `}</style>
         </div>
         
         <div className="mt-2">
-          <h3 className="font-semibold text-sm line-clamp-1">{sc_title}</h3>
+          <h3 className="font-semibold text-sm line-clamp-1 text-gray-600">{sc_title}</h3>
           <p className="text-gray-600 text-xs line-clamp-1">{user_name}</p>
         </div>
       </div>
@@ -471,7 +487,7 @@ const SoundCloudPlayerV3SingleTwo: React.FC<SoundCloudPlayerV3SingleTwoProps> = 
               {/* アーティスト情報 */}
               <div className="text-center mb-8">
                 {profile_img && (
-                  <div className="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden border-4 border-white/20">
+                  <div className="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden border border-white/20">
                     <Image
                       src={profile_img}
                       alt={user_name}
@@ -504,9 +520,10 @@ const SoundCloudPlayerV3SingleTwo: React.FC<SoundCloudPlayerV3SingleTwoProps> = 
                     onTouchEnd={handleProgressBarTouchEnd}
                   >
                     <div 
-                      className="h-full bg-gradient-to-r from-orange-400 to-orange-600 rounded-full"
+                      className="h-full rounded-full"
                       style={{ 
                         width: `${displayDuration > 0 ? (displayCurrentTime / displayDuration) * 100 : 0}%`,
+                        background: 'linear-gradient(90deg, #ffc7b4 0%, #ff6b35 100%)',
                         transition: isDragging ? 'none' : 'width 0.1s ease'
                       }}
                     />
@@ -519,14 +536,24 @@ const SoundCloudPlayerV3SingleTwo: React.FC<SoundCloudPlayerV3SingleTwoProps> = 
 
                 {/* コントロールボタン */}
                 <div className="flex items-center justify-center space-x-6">
-                  <button
+                  <div 
+                    role="button" 
+                    tabIndex={0} 
+                    className={`cursor-pointer p-1 ${displayIsLiked ? 'text-red-500' : 'text-gray-400'}`}
                     onClick={toggleLike}
-                    className={`p-3 rounded-full transition-colors ${displayIsLiked ? 'text-red-500' : 'text-gray-400 hover:text-red-500'}`}
                   >
-                    <svg className="w-8 h-8" fill={displayIsLiked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    <svg 
+                      width="32" 
+                      height="32" 
+                      viewBox="0 0 24 24" 
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path 
+                        d="M10.763 6.335a4.25 4.25 0 0 0-6.01 6.01L12 19.593l6.54-6.54.708-.708a4.25 4.25 0 1 0-6.01-6.01l-.708.707a.75.75 0 0 1-1.06 0l-.707-.707Zm1.77 14.846a.75.75 0 0 1-1.063.003l-7.778-7.778a5.75 5.75 0 0 1 8.131-8.132l.177.177.177-.177a5.75 5.75 0 1 1 8.131 8.132l-7.775 7.775Z" 
+                        fill="currentColor"
+                      />
                     </svg>
-                  </button>
+                  </div>
 
                   <button
                     onClick={togglePlay}
@@ -569,36 +596,6 @@ const SoundCloudPlayerV3SingleTwo: React.FC<SoundCloudPlayerV3SingleTwoProps> = 
         </div>
       )}
 
-      {/* ミニプレイヤー（ローカル表示用） */}
-      {showMiniPlayer && !isGlobalTrack && (
-        <div className="fixed bottom-4 right-4 bg-white shadow-lg rounded-lg p-3 flex items-center space-x-3 z-40">
-          <Image
-            src={sc_img}
-            alt={sc_title}
-            width={40}
-            height={40}
-            className="w-10 h-10 object-cover rounded"
-          />
-          <div className="flex-1 min-w-0">
-            <p className="font-medium text-sm line-clamp-1">{sc_title}</p>
-            <p className="text-gray-500 text-xs line-clamp-1">{user_name}</p>
-          </div>
-          <button
-            onClick={togglePlay}
-            className="w-8 h-8 bg-orange-500 hover:bg-orange-600 rounded-full flex items-center justify-center text-white"
-          >
-            {displayIsPlaying ? (
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M6 4h4v16H6zM14 4h4v16h-4z"/>
-              </svg>
-            ) : (
-              <svg className="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M8 5v14l11-7z"/>
-              </svg>
-            )}
-          </button>
-        </div>
-      )}
     </>
   )
 }

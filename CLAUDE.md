@@ -17,6 +17,15 @@
    - この実装なしではSafariで音楽プレイヤーが正常動作しない
    - React版からNext.js版への移行時に必ず含めること
 
+4. **React版にない設定を追加する際は必ず事前承認を得る - MANDATORY**
+   - linkflyer_reactリポジトリを参照し、既存の実装を確認する
+   - React版にない新しいCSS設定、JavaScript機能、HTML構造を追加する場合は必ずユーザーの承認を得る
+   - 特に以下の変更は要注意：
+     - グローバルCSS（html, body要素への設定）
+     - overflow、height、positionなどのレイアウト影響設定
+     - iOS Safari特有の挙動に関わる設定
+   - 承認なしに追加した場合は即座に元に戻すこと
+
 ## Overview
 LinkFlyer NextはReact版からNext.js 14 App Routerへの移行プロジェクトです。SSR/SSGの利点を活かしつつ、SoundCloud Widget APIを使用したグローバル音楽再生機能を実装し、パフォーマンスとSEOを向上させます。
 
@@ -36,59 +45,51 @@ LinkFlyer NextはReact版からNext.js 14 App Routerへの移行プロジェク�
 ## Project Structure
 ```
 linkflyer_next/
-├── app/
-│   ├── layout.tsx                      # Root layout with providers
-│   ├── page.tsx                        # Home page
-│   ├── auth/
-│   │   └── page.tsx                    # Authentication page
-│   ├── admin/
-│   │   ├── layout.tsx                  # Admin layout with protection
-│   │   ├── page.tsx                    # Admin dashboard
-│   │   ├── edit/page.tsx               # Profile editing
-│   │   ├── social/page.tsx             # Social links management
-│   │   ├── audio/page.tsx              # Audio management
-│   │   └── flyers/page.tsx             # Flyers management
-│   ├── [username]/
-│   │   └── page.tsx                    # Public user profile
-│   ├── flyers/
-│   │   └── [id]/page.tsx               # Flyer detail page
-│   ├── api/
-│   │   ├── auth/[...supabase]/route.ts # Supabase auth handler
-│   │   └── soundcloud/route.ts         # SoundCloud API proxy
-│   └── global.css                      # Global styles
-├── components/
-│   ├── providers/
-│   │   ├── TwoPlayerProvider.tsx       # Global player state
-│   │   └── SupabaseProvider.tsx        # Supabase client provider
-│   ├── audio/
-│   │   ├── SoundCloudPlayerV3.tsx      # Individual track player
-│   │   ├── GlobalMiniPlayer.tsx        # Persistent mini player
-│   │   ├── GlobalModal.tsx             # Full-screen modal
-│   │   └── TrackImage.tsx              # Track artwork component
-│   ├── ui/
-│   │   ├── Button.tsx                  # Reusable button
-│   │   ├── Input.tsx                   # Form input
-│   │   └── Modal.tsx                   # Modal wrapper
-│   └── layout/
-│       ├── Header.tsx                  # App header
-│       └── Footer.tsx                  # App footer
+├── src/
+│   └── app/
+│       ├── layout.tsx                      # Root layout with providers
+│       ├── page.tsx                        # Home redirect page
+│       ├── [username]/
+│       │   ├── page.tsx                    # Dynamic user profile (Server Component)
+│       │   └── ProfileClient.tsx           # Profile UI (Client Component)
+│       ├── auth/
+│       │   └── page.tsx                    # Authentication page (未実装)
+│       ├── admin/
+│       │   ├── layout.tsx                  # Admin layout with protection (未実装)
+│       │   ├── page.tsx                    # Admin dashboard (未実装)
+│       │   ├── edit/page.tsx               # Profile editing (未実装)
+│       │   ├── social/page.tsx             # Social links management (未実装)
+│       │   ├── audio/page.tsx              # Audio management (未実装)
+│       │   └── flyers/page.tsx             # Flyers management (未実装)
+│       ├── flyers/
+│       │   └── [id]/page.tsx               # Flyer detail page (未実装)
+│       ├── api/
+│       │   ├── auth/[...supabase]/route.ts # Supabase auth handler (未実装)
+│       │   └── soundcloud/route.ts         # SoundCloud API proxy (未実装)
+│       ├── globals.css                     # Global styles
+│       └── components/
+│           ├── SoundCloudPlayerV3SingleTwo.tsx  # Individual track player
+│           ├── GlobalMiniPlayer.tsx        # Persistent mini player
+│           ├── GlobalModal.tsx             # Full-screen modal
+│           ├── DebugInfo.tsx               # Debug information component
+│           └── providers/
+│               └── TwoPlayerProvider.tsx   # Global player state
 ├── lib/
 │   ├── supabase/
-│   │   ├── client.ts                   # Client-side Supabase
-│   │   ├── server.ts                   # Server-side Supabase
-│   │   └── middleware.ts               # Auth middleware
-│   ├── utils/
-│   │   └── soundcloud.ts               # SoundCloud utilities
-│   └── types/
-│       └── database.ts                 # Database types
+│   │   ├── client.ts                       # Client-side Supabase
+│   │   └── queries.ts                      # Database query functions
+│   └── utils/
+│       └── dataTransform.ts                # Data transformation utilities
+├── types/
+│   └── database.ts                         # Database type definitions
 ├── public/
-│   ├── icons/                          # Social media SVGs
-│   └── manifest.json                   # PWA manifest
-├── middleware.ts                       # Next.js middleware
-├── next.config.js                      # Next.js configuration
-├── tailwind.config.ts                  # Tailwind configuration
-├── tsconfig.json                       # TypeScript configuration
-└── .env.local                          # Environment variables
+│   ├── icons/                              # Social media SVG icons
+│   └── iori_asano-profile.jpg              # Profile image
+├── middleware.ts                           # Next.js middleware (未実装)
+├── next.config.js                          # Next.js configuration
+├── tailwind.config.ts                      # Tailwind configuration
+├── tsconfig.json                           # TypeScript configuration
+└── .env.local                              # Environment variables
 ```
 
 ## Key Differences from React Version
@@ -104,35 +105,47 @@ linkflyer_next/
 
 ## Migration Strategy
 
-### Phase 1: Foundation Setup ✅
-- [x] Create Next.js 14 project with App Router
-- [x] Configure TypeScript and Tailwind CSS
-- [x] Set up Supabase client/server instances
-- [x] Create basic folder structure
-- [x] Set up environment variables
+### Phase 0: Audio実装 + 動作確認 ✅
+- [x] Next.js 14 project with App Router setup
+- [x] Configure TypeScript and Tailwind CSS  
+- [x] TwoPlayerProvider implementation (500+ lines)
+- [x] SoundCloudPlayerV3SingleTwo (600+ lines)
+- [x] GlobalMiniPlayer implementation
+- [x] GlobalModal implementation  
+- [x] DebugInfo development tools
+- [x] Safari初回再生バウンス問題の解決
+- [x] Progress Barシーク機能完全実装
+- [x] Cross-page navigation testing
+- [x] Touch操作完全対応
+- [x] Glass Morphismデザイン統一
 
-### Phase 2: Core Components Migration
-- [ ] Migrate TwoPlayerContext to Next.js provider
-- [ ] Convert SoundCloudPlayer components to Client Components
-- [ ] Implement GlobalMiniPlayer with persistence
-- [ ] Create GlobalModal for full-screen playback
-- [ ] Set up audio state management
+### Phase 1: Supabase連携とプロファイルページ実装 ✅
+- [x] Supabase client configuration
+- [x] Database type definitions (Profile, Audio, Flyer)
+- [x] Query functions (getProfileByUsername, getAudioTracksByUserId, getFlyersByUserId)
+- [x] Data transformation utilities (SoundCloudTrack format)
+- [x] Dynamic [username] routing implementation
+- [x] ProfileClient component (Server/Client Components separation)
+- [x] Audio tracks display with Supabase data
+- [x] Flyers display with縦長レイアウト and オーバーレイ情報
+- [x] 再生中インディケータ (音波アニメーション)
+- [x] Home page redirect (/ → /naof219)
 
-### Phase 3: Page Migration
-- [ ] Home page with SSG
+### Phase 2: 追加機能実装 (未着手)
+- [ ] Admin dashboard pages
 - [ ] Authentication page with Supabase Auth
-- [ ] User profile page with dynamic routing
-- [ ] Admin dashboard with middleware protection
-- [ ] Admin sub-pages (edit, social, audio, flyers)
-- [ ] Flyer detail page
+- [ ] Flyer detail pages
+- [ ] User profile editing functionality
+- [ ] Audio/Flyer upload functionality
 
-### Phase 4: API & Server Functions
+### Phase 3: API & Server Functions (未着手)
 - [ ] SoundCloud oEmbed API proxy route
 - [ ] Image upload API endpoints
+- [ ] Authentication API routes
 - [ ] Database query optimizations
 - [ ] Edge function for auth checks
 
-### Phase 5: Features & Optimization
+### Phase 4: Features & Optimization (未着手)
 - [ ] PWA configuration
 - [ ] Service Worker setup
 - [ ] Image optimization with Next/Image
@@ -520,13 +533,13 @@ if (!isInitialized && !initClickedRef.current) {
 - PLAY イベント時: `setIsInitialized(true)`
 
 ### 実装チェックリスト
-- [ ] `initClickedRef` の追加
-- [ ] `isInitialized` ステートの追加
-- [ ] `initializeAndPlay` 関数の実装
-- [ ] `togglePlay` での初回処理分岐
-- [ ] 新規プレイヤー作成時のリセット
-- [ ] プレイヤー削除時のリセット
-- [ ] PLAY イベントでの初期化完了マーク
+- [x] `initClickedRef` の追加
+- [x] `isInitialized` ステートの追加
+- [x] `initializeAndPlay` 関数の実装
+- [x] `togglePlay` での初回処理分岐
+- [x] 新規プレイヤー作成時のリセット
+- [x] プレイヤー削除時のリセット
+- [x] PLAY イベントでの初期化完了マーク
 
 ⚠️ **警告**: この実装なしではSafariユーザーが音楽を正常に再生できません。React版からNext.js版への移行時に必ず含めること。
 
@@ -545,9 +558,117 @@ if (!isInitialized && !initClickedRef.current) {
 - [ ] Dark mode
 - [ ] Offline support with Service Worker
 
+## 🎯 Phase 0 完了: Audio実装 + 動作確認
+**実装完了日**: 2025-08-07  
+**ステータス**: ✅ 完了済み
+**最終更新日**: 2025-08-10
+
+### 主要実装成果
+1. **Safari Audio互換性**: 初回再生バウンス問題の完全解決
+2. **Two Player Architecture**: React版からの完全移植
+3. **Global/Local状態管理**: 重複更新問題の解決
+4. **Progressive Enhancement**: SSR/CSR境界の適切な処理
+5. **Glass Morphism UI**: 現代的で統一されたデザイン
+6. **完全なモバイル対応**: タッチ操作の完全実装
+7. **パフォーマンス最適化**: 無駄なAPI呼び出し削除
+8. **デバッグシステム**: 包括的な状態監視機能
+
+### 技術的な主要解決項目
+- **Safari初回再生バウンス**: `initializeAndPlay`による確実な初期化
+- **Progress Bar不具合**: グローバル/ローカル状態の完全分離
+- **PLAY_PROGRESS重複**: 条件分岐による適切な更新制御
+- **モバイル操作**: Touch eventsの完全対応
+- **React Hooks Rules**: 全ルール準拠による安定性向上
+- **Z-index管理**: 階層化UI要素の適切な配置
+
+### React版からの改善点
+- **TypeScript型安全性**: より厳密な型チェック
+- **Next.js最適化**: Server/Client Componentsの適切な分離
+- **UI統一性**: Glass morphismによる一貫したデザイン
+- **開発体験**: 包括的なデバッグ機能
+- **パフォーマンス**: Position polling最適化
+- **アクセシビリティ**: より良いキーボード/タッチ対応
+
+## 📝 2025-08-10 追加修正内容
+
+### 1. Global Mini Player表示問題の修正
+- **問題**: タブ切り替え時の初期表示不具合、スクロール時の沈み込み
+- **原因**: CSS設定の不完全な移植
+- **解決策**: 
+  - React版の`soundcloud-miniplayer-v3`クラスを`.global-mini-player-fixed`として完全移植
+  - `position: fixed !important`など、全ての重要な設定を適用
+  - GPU accelerationとレンダリング最適化を追加
+
+### 2. iOS Safari URLバー問題の解決
+- **問題**: スクロール時にURLバーが自動非表示にならない
+- **原因**: React版にない`height: 100%`と`overflow-x: hidden`を追加していた
+- **解決策**: React版と同じシンプルな設定に戻す（bodyの`margin: 0`のみ）
+
+### 3. Debug Info位置調整
+- **問題**: Debug InfoがModalの操作を妨げていた
+- **解決策**: 50px上に移動（top: 70px → 20px）
+
+### 4. 開発ルールの追加
+- **新ルール**: React版にない設定を追加する際は必ず事前承認を得る（CRITICAL RULES #4）
+
+## 🖼️ Flyer Modal System - Multi-Modal管理
+
+### Flyer Modal実装 (2025-08-10)
+プロファイルページのフライヤー表示機能として、独立したFlyer Modalシステムを実装しました。
+
+#### 主要機能
+1. **独立したModal管理**
+   - Audio系Modal（Global/Local Modal）とは完全分離
+   - 専用コンポーネント: `FlyerModal.tsx`
+   - ProfileClient内で状態管理
+
+2. **Modal競合制御**
+   - Global Modal表示時 → Flyer Modal自動で閉じる
+   - 複数modalの同時表示を防止
+   - Two Player Architectureの既存制御と統一
+
+3. **UIデザイン**
+   - Audio Local Modalと統一されたClose buttonデザイン
+   - 白い角丸コンテナ、背景ぼかし効果
+   - レスポンシブ対応、ESCキー/背景クリック対応
+
+4. **フライヤー情報表示**
+   - 大きなフライヤー画像表示
+   - タイトル、説明文
+   - イベント日付（英語形式、漢字なし）
+   - 会場名、住所（絵文字なし、シンプル表示）
+
+#### 技術実装
+```typescript
+// ProfileClient.tsx内での制御
+const { globalModalVisible } = useTwoPlayer()
+
+// Global Modalが開いたときにFlyer Modalを閉じる
+useEffect(() => {
+  if (globalModalVisible && isFlyerModalOpen) {
+    console.log('Closing flyer modal because global modal opened')
+    setIsFlyerModalOpen(false)
+    setSelectedFlyer(null)
+  }
+}, [globalModalVisible, isFlyerModalOpen])
+```
+
+#### Modal階層管理
+- **最優先**: Global Modal (z-index: 最高)
+- **次優先**: Local Modal (Audio用)
+- **その他**: Flyer Modal (Global Modalにより制御される)
+
+この実装により、ユーザー体験を損なうことなく、複数のmodalが適切に管理されています。
+
 ## Notes
-- Migration focuses on maintaining feature parity first
-- Performance improvements through SSR/SSG
-- Better SEO for public profiles
-- Improved developer experience with App Router
-- All existing features from React version will be preserved
+- **Phase 0・1完了**: 音楽プレイヤーシステム + Supabaseデータ連携 + プロファイルページ実装完了
+- React版と100%同等の音楽再生機能とユーザー体験を実現
+- Safari含む全ブラウザでの音楽プレイヤー動作確認済み
+- **完全実装済み機能**:
+  - SoundCloud Widget APIによる音楽再生（Two Player Architecture）
+  - Supabaseからのプロファイル・オーディオ・フライヤーデータ取得
+  - 動的ルーティング（/[username]）によるプロファイルページ
+  - 縦長フライヤー表示とオーバーレイ情報
+  - 再生中トラックの音波アニメーションインディケータ
+  - Flyer Modalシステム（Audio Modalと独立管理、競合制御）
+- **Phase 2以降は未着手**: 管理画面、認証、詳細ページなどの追加機能
