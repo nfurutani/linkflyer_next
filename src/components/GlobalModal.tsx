@@ -116,9 +116,9 @@ const GlobalModal: React.FC = () => {
   const displayCurrentTime = isDragging ? dragTime : globalCurrentTime
 
   return (
-    <div className="fixed inset-0 z-[55] flex items-center justify-center">
+    <div className="fixed inset-0 z-[55] overflow-y-auto">
       {/* 背景画像 */}
-      <div className="absolute inset-0">
+      <div className="fixed inset-0">
         <Image
           src={globalCurrentTrack.sc_img}
           alt=""
@@ -129,8 +129,10 @@ const GlobalModal: React.FC = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/80 to-black/90" />
       </div>
 
-      {/* モーダルコンテンツ */}
-      <div className="relative w-full max-w-2xl p-8">
+      {/* スクロール可能なコンテナ */}
+      <div className="relative min-h-full flex items-start justify-center p-4 py-8 pb-24">
+        {/* モーダルコンテンツ */}
+        <div className="relative w-full max-w-2xl">
         <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-8 shadow-2xl border border-white/20">
           {/* クローズボタン */}
           <button
@@ -249,6 +251,7 @@ const GlobalModal: React.FC = () => {
               </div>
             )}
           </div>
+        </div>
         </div>
       </div>
     </div>
