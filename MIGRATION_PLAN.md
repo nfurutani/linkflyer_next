@@ -81,12 +81,19 @@ Supabaseデータベースとの連携機能およびlinkflyer_reactと同等の
    - React版にない設定追加時の事前承認ルールを制定
    - CLAUDE.mdのCRITICAL RULES #4として明文化
 
-5. **Flyer Modal System実装 (2025-08-10)**
+5. **Flyer Modal System実装 (2025-08-10 → 2025-08-11更新)**
    - フライヤー画像クリック時のModal表示機能
    - Audio Modal（Global/Local）と独立したModal管理
-   - Modal競合制御: Global Modal表示時にFlyer Modal自動終了
+   - **柔軟なModal同時表示**: Flyer Modal + Global Modal同時表示可能 (2025-08-11)
+   - **統一スクロール体験**: 全Modalでページ全体スクロール対応 (2025-08-11)
    - レスポンシブデザイン、キーボード操作対応
    - フライヤー情報の詳細表示（日付、会場情報等）
+
+6. **Modal UX革新 (2025-08-11追加)**
+   - 音楽を聴きながらイベント情報確認が可能
+   - Global Mini Player完全対応（`pb-24`でOverlap回避）
+   - モバイルでの自然なスクロール体験統一
+   - より直感的で中断のないユーザー体験を実現
 
 ---
 

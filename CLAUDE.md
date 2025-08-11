@@ -612,54 +612,72 @@ if (!isInitialized && !initClickedRef.current) {
 ### 4. 開発ルールの追加
 - **新ルール**: React版にない設定を追加する際は必ず事前承認を得る（CRITICAL RULES #4）
 
-## 🖼️ Flyer Modal System - Multi-Modal管理
+## 🖼️ Flyer Modal System - 柔軟なMulti-Modal体験
 
-### Flyer Modal実装 (2025-08-10)
+### Flyer Modal実装 (2025-08-10 → 2025-08-11更新)
 プロファイルページのフライヤー表示機能として、独立したFlyer Modalシステムを実装しました。
 
 #### 主要機能
 1. **独立したModal管理**
    - Audio系Modal（Global/Local Modal）とは完全分離
    - 専用コンポーネント: `FlyerModal.tsx`
-   - ProfileClient内で状態管理
+   - ProfileClient内で独立した状態管理
 
-2. **Modal競合制御**
-   - Global Modal表示時 → Flyer Modal自動で閉じる
-   - 複数modalの同時表示を防止
-   - Two Player Architectureの既存制御と統一
+2. **柔軟なModal同時表示** (2025-08-11更新)
+   - ✅ **Flyer Modal + Global Modal同時表示可能**
+   - フライヤー詳細を見ながら音楽プレイヤー操作
+   - より自由なユーザーインタラクション体験
+   - 音楽再生を中断せずにイベント情報確認
 
-3. **UIデザイン**
+3. **統一されたスクロール体験** (2025-08-11更新)
+   - 全Modalでページ全体スクロール対応
+   - カード高さがコンテンツに自然適応
+   - Global Mini Playerとの適切な間隔 (`pb-24`)
+   - モバイルでの快適な縦スクロール
+
+4. **UIデザイン**
    - Audio Local Modalと統一されたClose buttonデザイン
    - 白い角丸コンテナ、背景ぼかし効果
    - レスポンシブ対応、ESCキー/背景クリック対応
 
-4. **フライヤー情報表示**
-   - 大きなフライヤー画像表示
+5. **フライヤー情報表示**
+   - 大きなフライヤー画像表示（縦長レイアウト）
    - タイトル、説明文
    - イベント日付（英語形式、漢字なし）
    - 会場名、住所（絵文字なし、シンプル表示）
 
-#### 技術実装
+#### 技術実装の変遷
 ```typescript
-// ProfileClient.tsx内での制御
+// 2025-08-10: 競合制御あり（削除済み）
+/*
 const { globalModalVisible } = useTwoPlayer()
-
-// Global Modalが開いたときにFlyer Modalを閉じる
 useEffect(() => {
   if (globalModalVisible && isFlyerModalOpen) {
-    console.log('Closing flyer modal because global modal opened')
-    setIsFlyerModalOpen(false)
-    setSelectedFlyer(null)
+    setIsFlyerModalOpen(false) // 強制終了
   }
 }, [globalModalVisible, isFlyerModalOpen])
+*/
+
+// 2025-08-11: 独立したシンプルな管理
+const [selectedFlyer, setSelectedFlyer] = useState<Flyer | null>(null)
+const [isFlyerModalOpen, setIsFlyerModalOpen] = useState(false)
+
+// Flyer ModalとGlobal Modalは独立して動作
 ```
 
-#### Modal階層管理
-- **最優先**: Global Modal (z-index: 最高)
-- **次優先**: Local Modal (Audio用)
-- **その他**: Flyer Modal (Global Modalにより制御される)
+#### Modal階層管理 (更新)
+- **最上位**: Global Mini Player (`z-[70]`) - 常に操作可能
+- **上位**: Global Modal (`z-[55]`) - 音楽プレイヤー詳細
+- **中位**: Flyer Modal (`z-50`) - フライヤー詳細
+- **中位**: Local Modal (`z-50`) - 個別音楽プレイヤー
 
-この実装により、ユーザー体験を損なうことなく、複数のmodalが適切に管理されています。
+#### 実現されたUX
+- 🎵 **音楽を聴きながらイベント情報確認**
+- 🖼️ **フライヤー詳細とプレイヤー操作の同時実行**
+- 📱 **モバイルでの自然なスクロール体験**
+- ⚡ **中断のない流れるような操作感**
+
+この柔軟な実装により、ユーザーはより自由で直感的なModal操作体験を得られます。
 
 ## 🔧 ESLint設定とコード品質管理
 
