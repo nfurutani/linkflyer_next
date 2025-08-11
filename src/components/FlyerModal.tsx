@@ -34,7 +34,7 @@ export default function FlyerModal({ flyer, isOpen, onClose }: FlyerModalProps) 
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pb-20">
       {/* 背景オーバーレイ */}
       <div 
         className="absolute inset-0 bg-black/80 backdrop-blur-sm"
@@ -42,7 +42,7 @@ export default function FlyerModal({ flyer, isOpen, onClose }: FlyerModalProps) 
       />
       
       {/* モーダルコンテンツ */}
-      <div className="relative max-w-2xl max-h-[90vh] mx-4 bg-white rounded-lg overflow-hidden shadow-2xl">
+      <div className="relative w-full max-w-2xl max-h-full bg-white rounded-lg shadow-2xl flex flex-col overflow-hidden">
         {/* 閉じるボタン - Audio local modalと同じデザイン */}
         <button
           onClick={onClose}
@@ -63,21 +63,23 @@ export default function FlyerModal({ flyer, isOpen, onClose }: FlyerModalProps) 
           </svg>
         </button>
         
-        {/* フライヤー画像 */}
-        <div className="relative">
-          <Image
-            src={flyer.image_url}
-            alt={flyer.title || 'Flyer'}
-            width={800}
-            height={1000}
-            className="w-full h-auto object-contain"
-            priority
-          />
-        </div>
-        
-        {/* フライヤー情報 */}
-        {(flyer.title || flyer.description || flyer.event_date || flyer.venue_name || flyer.venue_address) && (
-          <div className="p-6 bg-white">
+        {/* スクロール可能なコンテンツ */}
+        <div className="flex-1 overflow-y-auto">
+          {/* フライヤー画像 */}
+          <div className="relative">
+            <Image
+              src={flyer.image_url}
+              alt={flyer.title || 'Flyer'}
+              width={800}
+              height={1000}
+              className="w-full h-auto object-contain"
+              priority
+            />
+          </div>
+          
+          {/* フライヤー情報 */}
+          {(flyer.title || flyer.description || flyer.event_date || flyer.venue_name || flyer.venue_address) && (
+            <div className="p-6 bg-white pb-24">
             {flyer.title && (
               <h2 className="text-2xl font-bold mb-3 text-gray-800">{flyer.title}</h2>
             )}
@@ -112,9 +114,10 @@ export default function FlyerModal({ flyer, isOpen, onClose }: FlyerModalProps) 
                   <span>{flyer.venue_address}</span>
                 </div>
               )}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   )
