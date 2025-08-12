@@ -1,4 +1,4 @@
-import { supabase } from './client'
+import { createClientSupabaseClient } from '../../src/lib/supabase/client'
 import { Profile, Audio } from '../../types/database'
 
 /**
@@ -6,6 +6,7 @@ import { Profile, Audio } from '../../types/database'
  */
 export async function getProfileByUsername(username: string): Promise<Profile | null> {
   try {
+    const supabase = createClientSupabaseClient()
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
@@ -31,6 +32,7 @@ export async function getProfileByUsername(username: string): Promise<Profile | 
  */
 export async function getAudioTracksByUserId(userId: string): Promise<Audio[]> {
   try {
+    const supabase = createClientSupabaseClient()
     const { data, error } = await supabase
       .from('audio')
       .select('*')
@@ -53,6 +55,7 @@ export async function getAudioTracksByUserId(userId: string): Promise<Audio[]> {
  */
 export async function getFlyersByUserId(userId: string) {
   try {
+    const supabase = createClientSupabaseClient()
     const { data, error } = await supabase
       .from('flyers')
       .select('*')
@@ -71,19 +74,43 @@ export async function getFlyersByUserId(userId: string) {
 }
 
 /**
- * プロファイル、オーディオトラック、フライヤーを一括取得
+ * ユーザーのソーシャルリンクを取得
+ */
+export async function getSocialLinksByUserId(userId: string) {
+  try {
+    const supabase = createClientSupabaseClient()
+    const { data, error } = await supabase
+      .from('social')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('active', true)
+      .order('order_index', { ascending: true })
+
+    if (error) {
+      throw error
+    }
+    
+    return data || []
+  } catch (error) {
+    return []
+  }
+}
+
+/**
+ * プロファイル、オーディオトラック、フライヤー、ソーシャルリンクを一括取得
  */
 export async function getProfileWithAudioTracks(username: string) {
   try {
     const profile = await getProfileByUsername(username)
     if (!profile) {
-      return { profile: null, audioTracks: [], flyers: [] }
+      return { profile: null, audioTracks: [], flyers: [], socialLinks: [] }
     }
 
     const audioTracks = await getAudioTracksByUserId(profile.user_id)
     const flyers = await getFlyersByUserId(profile.user_id)
-    return { profile, audioTracks, flyers }
+    const socialLinks = await getSocialLinksByUserId(profile.user_id)
+    return { profile, audioTracks, flyers, socialLinks }
   } catch (error) {
-    return { profile: null, audioTracks: [], flyers: [] }
+    return { profile: null, audioTracks: [], flyers: [], socialLinks: [] }
   }
 }

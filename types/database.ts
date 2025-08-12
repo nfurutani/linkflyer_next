@@ -4,6 +4,7 @@ export interface Profile {
   display_name: string | null
   bio: string | null
   profile_image: string | null
+  // Legacy social fields (will be deprecated)
   instagram_username: string | null
   x_username: string | null
   youtube_url: string | null
@@ -15,6 +16,18 @@ export interface Profile {
   email_address: string | null
   facebook_url: string | null
   website_url: string | null
+  social_links_order: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface Social {
+  id: string
+  user_id: string
+  platform: string
+  value: string
+  active: boolean
+  order_index: number
   created_at: string
   updated_at: string
 }

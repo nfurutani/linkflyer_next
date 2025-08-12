@@ -1,245 +1,286 @@
-# LinkFlyer Next - 音楽プレイヤー完全実装プロジェクト
+# LinkFlyer Next.js - Admin System Implementation (React版忠実移植)
 
-## 🎉 最重要機能 - 完成！
-**Two Player Architecture、Global Modal、Global MiniPlayer、Local Modalによる完全な音楽再生システム**
+## 🎯 Project Goal
+linkflyer_reactのadmin機能をNext.js 14 App Routerで**100%忠実に再現**する  
+**重要**: Profileページ（public profile）は一切変更しない
 
-## 📊 進捗状況サマリー
+## 📋 React版分析結果 - 実際の仕様
 
-| Phase | 項目 | 進捗 | 優先度 | 状態 |
-|-------|------|------|--------|------|
-| **Phase 0** | Audio実装 + 動作確認 | ✅ **100%** | **完了** | ✅ 完全動作確認済み |
-| **Phase 1** | 追加ページ実装 | ⏸️ 0% | 高 | 待機中 |
-| **Phase 2** | API/データ連携実装 | ⏸️ 0% | 中 | 待機中 |
+### Admin Pages（5ページ）
+1. **AdminDashboard** (`/admin`) - プロファイル概要 + ナビゲーション
+2. **AdminEdit** (`/admin/edit`) - プロファイル編集
+3. **AdminSocial** (`/admin/social`) - ソーシャルリンク管理  
+4. **AdminAudio** (`/admin/audio`) - SoundCloudトラック管理
+5. **AdminFlyers** (`/admin/flyers`) - フライヤー管理
 
----
+### Authentication System
+- **AuthPage** - Email/Password認証
+- **ProtectedRoute Component** - admin routes保護
+- **自動リダイレクト**: 未認証 → `/auth`, 認証済み → `/admin`
 
-## ✅ Phase 0: Audio実装 + 動作確認（完了）
+## 🏗️ 実際のファイル構造（React版ベース）
 
-### 🎵 実装された機能（全て完了）
-- ✅ **TwoPlayerProvider**: React版完全移植（500行超）
-- ✅ **SoundCloudPlayerV3SingleTwo**: Local Modal付きプレイヤー（600行超）  
-- ✅ **GlobalMiniPlayer**: 底部固定プレイヤー（107行）
-- ✅ **GlobalModal**: Glass Morphismフルスクリーンモーダル（274行）
-- ✅ **DebugInfo**: 包括的なデバッグパネル（273行）
-- ✅ **メインレイアウト**: layout.tsx、globals.css、page.tsx
+### Pages Structure
+```
+src/pages/admin/
+├── AdminDashboard.tsx    # 166行 - ダッシュボード
+├── AdminEdit.tsx         # 287行 - プロファイル編集
+├── AdminSocial.tsx       # 777行 - ソーシャルリンク管理
+├── AdminAudio.tsx        # 大規模 - オーディオ管理
+└── AdminFlyers.tsx       # 139行 - フライヤー管理
 
-### ✅ 動作確認項目（全て完了）
-- ✅ 依存関係のインストール確認（autoprefixer追加済み）
-- ✅ TypeScript型エラーがないか確認（エラーなし）
-- ✅ ビルドエラーがないか確認（ビルド成功）
-- ✅ 開発サーバーが起動するか確認（localhost:3000で起動確認）
-- ✅ 基本的なUI表示の確認（起動確認済み）
-- ✅ コンポーネントの読み込み確認（ビルド時確認済み）
-- ✅ **SoundCloudでのaudio動作確認**（完了）
-  - ✅ 実際の4つのSoundCloudトラックでの再生テスト
-  - ✅ Two Player方式でのトラック切り替えテスト
-  - ✅ Local Modal → Global Modal遷移テスト
-  - ✅ Progress Bar seek機能テスト（位置戻り問題解決済み）
-  - ✅ Cross-Page Navigation テスト（/discover, /trending, /artists）
-  - ✅ 再生継続性確認（ページ遷移時のシームレス再生）
-  - ✅ Touch操作対応確認
-  - ✅ Glass Morphism Modal Design統一
+AuthPage.tsx              # 99行 - 認証ページ
+```
 
-### 🏆 完全実装された機能
-- ✅ **Two Player Architecture**: 最大2プレイヤーの効率的管理
-- ✅ **Global/Local Modal**: 完全統一されたGlass Morphismデザイン
-- ✅ **Global MiniPlayer**: 永続化された底部プレイヤー
-- ✅ **Cross-Page Continuity**: ページ遷移での再生継続
-- ✅ **Seek Functionality**: 安定したProgress bar操作（位置戻り問題完全解決）
-- ✅ **Touch Support**: モバイル完全対応（TouchStart/Move/End）
-- ✅ **State Management**: グローバル/ローカル状態の完全分離
-- ✅ **Debug System**: 包括的なデバッグ情報表示
-- ✅ **React Hooks Compliance**: 全ルール準拠の安全な実装
-- ✅ **Z-Index Management**: 階層化されたUI要素管理
+### Next.js版での対応構造
+```
+app/admin/
+├── layout.tsx           # 認証保護 (ProtectedRoute相当)
+├── page.tsx            # AdminDashboard移植
+├── edit/page.tsx       # AdminEdit移植
+├── social/page.tsx     # AdminSocial移植
+├── audio/page.tsx      # AdminAudio移植
+└── flyers/page.tsx     # AdminFlyers移植
 
----
+app/auth/page.tsx       # AuthPage移植
+middleware.ts           # ルート保護
+```
 
-## 🔴 Phase 1: 追加ページ実装（次の優先項目）
+## 📄 Page-by-Page 実装仕様（React版準拠）
 
-### 📋 実装ページ
-- [ ] **HomePage**: ランディングページ + 音楽プレイヤー統合
-- [ ] **UserProfilePage**: ユーザープロフィール表示 + 音楽プレイヤー統合  
-- [ ] **AdminPages**: 管理画面
-  - [ ] Admin Dashboard
-  - [ ] Profile編集
-  - [ ] Audio管理
-  - [ ] Flyer管理
-- [ ] **AuthPage**: 認証ページ
-- [ ] **FlyerDetailPage**: フライヤー詳細ページ
+### 1. AdminDashboard (`/admin`)
 
----
+**実際のUI構造**:
+- 固定ヘッダー (`z-30`, 120px padding-top)
+- プロファイルプレビューカード (中央寄せ、画像・名前・bio)
+- 4つのナビゲーションカード (3列グリッド、モバイル1列)
+- Sign Outボタン (ヘッダー右上)
 
-## 🔌 Phase 2: API/データ連携実装（Phase 1完了後）
+**実際の機能**:
+- プロファイル自動作成 (初回訪問時、PGRST116エラーハンドリング)
+- パブリックプロファイルリンク (`window.open`)
+- 各管理ページへのナビゲーション
 
-### 📋 実装項目
-- [ ] **Supabase統合**: データベース接続
-- [ ] **認証フロー**: ログイン・ログアウト
-- [ ] **データ永続化**: プロフィール・音楽データ保存
-- [ ] **画像アップロード**: プロフィール画像・フライヤー画像
-  - [ ] `/api/images/upload` API Route実装
-  - [ ] Supabase Storage設定 (profile-images, flyer-images buckets)
-  - [ ] ファイル検証（サイズ・形式制限）
-  - [ ] 画像最適化・リサイズ処理
-  - [ ] アップロード進捗表示
-  - [ ] profiles/flyers テーブル連携
-- [ ] **エラーハンドリング**: API エラー処理
+**実際のスタイリング**:
+- `max-w-7xl`, `bg-gray-100`, Purple-600テーマ
+- カードホバー効果、矢印アイコン付き
 
----
+### 2. AdminEdit (`/admin/edit`)
 
-## 🎵 Phase 0完了 - 実装詳細
+**実際のUI構造**:
+- 戻るボタン付きヘッダー
+- プロファイル画像アップロード (プレビュー、変更、削除)
+- 3つの入力フィールド: username, display_name, bio
+- 文字数カウンター (bio用)
 
-### ✅ 技術的成果
+**実際の機能**:
+- Supabase Storageへの画像アップロード
+- 古い画像の自動削除
+- 1MB画像サイズ制限
+- ファイルタイプ検証
+- フォームバリデーション
 
-#### 1. グローバル/ローカルトラック完全分離
+**実装詳細**:
+- `profile-images` bucket使用
+- `${user.id}-${Date.now()}.${fileExt}` ファイル命名
+- 確認ダイアログ付き削除機能
+
+### 3. AdminSocial (`/admin/social`)
+
+**実際のプラットフォーム**:
+11プラットフォーム (React版line 7-19で確認):
+- Instagram, Threads, TikTok, X (username型)
+- Facebook, YouTube, Discogs, Bandcamp, SoundCloud, Website (URL型)  
+- Email (email型)
+
+**実際のUI構造**:
+- SVG動的読み込み (`/svg/${platform.id}.svg`)
+- ドラッグ&ドロップ (Touch対応)
+- レスポンシブモーダル (モバイル: bottomsheet)
+- アクティブ/非アクティブ切り替え
+
+**実際の機能**:
+- 既存データから `SocialLink[]` 配列変換
+- データベース保存時の逆変換
+- プラットフォーム別入力検証
+- ドラッグによる並び替え
+
+**重要な実装詳細**:
 ```typescript
-// 適切な状態分岐による重複更新防止
-const displayIsPlaying = isGlobalTrack ? globalIsPlaying : isPlaying
-const displayCurrentTime = isDragging ? dragTime : (isGlobalTrack ? globalCurrentTime : currentTime)
+// React版のactivate/deactivate仕組み (line 193-198)
+const handleToggleActive = async (index: number) => {
+  const updated = [...socialLinks];
+  updated[index] = { ...updated[index], active: !updated[index].active };
+  setSocialLinks(updated);
+  await saveLinksToDatabase(updated);
+};
 ```
 
-#### 2. Progress Bar位置戻り問題の完全解決
+### 4. AdminAudio (`/admin/audio`)
+
+**実際の機能**:
+- SoundCloud URL入力・検証
+- oEmbed APIによるメタデータ取得
+- 重複URL検出 (正規化比較)
+- ドラッグ&ドロップ並び替え
+- アートワーク自動取得
+- ショップリンク編集
+
+**React版で確認した詳細**:
+- `audio`テーブル使用 (不是 `links`)
+- `normalizeUrl`関数 (クエリパラメータ除去)
+- モバイル用テキスト短縮
+- Touch対応ドラッグ
+- 確認モーダル付きトラック追加
+
+**API連携**:
+- `isValidSoundCloudUrl` バリデーション
+- `getSoundCloudTrackInfo` oEmbed取得
+- CORS proxy経由 (AllOrigins等)
+
+### 5. AdminFlyers (`/admin/flyers`)
+
+**実際の機能**:
+- フライヤー一覧表示
+- ソフト削除 (`deleted_at` + `active: false`)
+- Storage画像削除
+- 確認ダイアログ
+
+**実装状況**:
+- アップロード機能は "Coming Soon" プレースホルダー
+- 削除機能のみ実装済み
+- グリッド表示、レスポンシブ対応
+
+### 6. AuthPage (`/auth`)
+
+**実際のUI・機能**:
+- Email/Password認証フォーム
+- Sign In / Sign Up切り替え
+- エラーメッセージ表示
+- 認証成功時の `/admin` リダイレクト
+- Purple-600テーマ
+
+## 🔧 Technical Implementation Details
+
+### Database Schema (既存使用)
+```sql
+-- profilesテーブル
+profiles: user_id, username, display_name, bio, profile_image, 
+          instagram_username, x_username, youtube_url, threads_username, 
+          soundcloud_url, tiktok_username, bandcamp_url, discogs_url, 
+          facebook_url, website_url, email_address
+
+-- audioテーブル  
+audio: id, user_id, url, title, artist, image_url, shop_link, order, active
+
+-- flyersテーブル
+flyers: id, user_id, image_url, title, description, event_date, venue_name, 
+        venue_address, active, deleted_at
+```
+
+### Authentication Flow (React版)
 ```typescript
-// MouseUp/TouchEndタイミングでのseek実行 + 自動更新抑制
-const handleMouseUp = (e: MouseEvent) => {
-  seekToPosition(e.clientX, progressBar, false)
-  if (!isGlobalTrack) {
-    seekTimeoutRef.current = setTimeout(() => {
-      seekTimeoutRef.current = null
-    }, 800) // 800ms間は自動更新を抑制
-  }
-}
+// App.tsx - ProtectedRoute パターン
+const ProtectedRoute = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user);
+      setLoading(false);
+    });
+  }, []);
+
+  return user ? children : <Navigate to="/auth" />;
+};
 ```
 
-#### 3. Glass Morphism統一デザイン
-- **Local Modal & Global Modal**: 完全に統一されたデザイン
-- **Glass Effect**: `bg-white/10 backdrop-blur-xl`
-- **Z-Index管理**: Mini Player(z-[70]) > Global Modal(z-[55]) > Local Modal(z-50)
+### State Management Pattern (React版)
+- **Local State**: `useState` for UI状態
+- **Supabase**: Database操作
+- **No Global State**: admin機能は各ページ独立
 
-#### 4. Cross-Page Navigation Test
-- **テストページ**: `/discover`, `/trending`, `/artists`
-- **実際のSoundCloudトラック**: 4曲での完全テスト
-- **再生継続性**: ページ遷移時のシームレスな音楽再生確認済み
-
-### 🔧 実装されたコンポーネント
-
-1. **TwoPlayerProvider** (500行超) - React版完全移植
-   - iframe管理Map構造
-   - プレイヤー削除ロジック（500ms遅延）
-   - グローバル/ローカル状態管理
-   - SoundCloud Widget API統合
-   - Seek処理の最適化（globalSeekTo機能）
-
-2. **SoundCloudPlayerV3SingleTwo** (600行超) - React版完全移植 
-   - Local Modal機能（Glass Morphism対応）
-   - ドラッグ対応プログレスバー（位置戻り問題解決済み）
-   - タッチイベント処理（TouchStart/Move/End）
-   - グローバル状態同期
-   - PLAY_PROGRESS適切処理
-   - Position Polling最適化
-
-3. **GlobalMiniPlayer** (107行) - 完全実装
-   - 底部固定プレイヤー（z-[70]で最上位）
-   - グローバル状態同期
-   - クリックでGlobal Modal遷移
-   - Global Modal表示中も操作可能
-
-4. **GlobalModal** (274行) - 完全実装
-   - Glass Morphismフルスクリーンモーダル
-   - ドラッグ対応プログレスバー
-   - レスポンシブデザイン
-   - 背景トラックアートワーク活用
-
-5. **DebugInfo** (273行) - 完全実装
-   - プレイヤー状態の詳細表示
-   - グローバル状態監視
-   - UI状態確認
-   - Hydration安全対応
-
-### 📋 テスト済み実際のSoundCloudトラック
-1. **Daniel Wang at Lente Kabinet Festival 2019** (103分28秒)
-2. **Larry Levan - Paradise Garage 1979** 
-3. **Nicky Siano Live at The Gallery II Opening 1974**
-4. **Bobby Konders Mix**
-
----
-
-## 🔧 解決した技術的課題
-
-### 1. React Hooks Rules Violation
-**解決**: 全てのhooksを条件分岐前に呼び出すよう修正
-
-### 2. Progress Bar位置戻り問題
-**解決**: MouseUp/TouchEndタイミングでのseek実行 + seekTimeoutRefによる自動更新抑制
-
-### 3. 状態競合問題  
-**解決**: `isGlobalTrack`による適切な状態分岐とPLAY_PROGRESS早期リターン
-
-### 4. Hydration Error
-**解決**: `isClient`状態による安全なwindowオブジェクトアクセス
-
-### 5. Z-Index階層問題
-**解決**: GlobalMiniPlayer > GlobalModal > LocalModalの適切な階層設定
-
----
-
-## 📚 参考資料
-- [CLAUDE.md](./CLAUDE.md) - プロジェクト仕様
-- [MIGRATION_PLAN.md](./MIGRATION_PLAN.md) - 詳細な実装ポイントと技術解説
-- React版実装: `/tmp/linkflyer_react/`
-
----
-
-## ⏰ 推定工数
-
-- **Phase 0**: Audio実装 + 動作確認 ✅ **完了**（実際: 12時間）
-- **Phase 1**: 追加ページ実装 🔴 **次の優先**（予定: 6-8時間）
-- **Phase 2**: API/データ連携実装（予定: 4-6時間）
-- **合計予定**: 22-26時間（Phase 0: 12時間完了済み）
-
----
-
-## 🎯 Phase 0成功達成項目（全て完了）
-
-✅ React版と同等以上の音楽再生機能が動作  
-✅ Two Player Architectureが正常に機能  
-✅ Global/Local Modalが適切に切り替わる  
-✅ ページ遷移時も音楽が途切れない  
-✅ Progress Bar seek操作が安定動作  
-✅ Touch操作が完全対応  
-✅ Glass Morphism統一デザイン  
-✅ デバッグ機能完備  
-
----
-
-## 🚀 次のアクション
-
-### 🔴 Phase 1開始: 追加ページ実装
-音楽プレイヤーシステムが完全に動作確認済みのため、以下のページ実装に進む：
-
-1. **HomePage**: ランディングページ + 統合された音楽プレイヤー
-2. **UserProfilePage**: `[username]`動的ルーティング対応
-3. **AdminPages**: 管理画面群
-4. **AuthPage**: Supabase Auth統合
-5. **FlyerDetailPage**: 個別フライヤー表示
-
-### 開発コマンド
-```bash
-# 開発サーバー起動（確認済み - 完全動作）
-npm run dev
-
-# 音楽プレイヤーテスト
-open http://localhost:3000
+### File Upload (React版パターン)
+```typescript
+// AdminEdit.tsx の画像アップロード
+const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  // 1MB制限、image/*タイプ検証
+  // 古い画像削除
+  // 新画像アップロード
+  // publicURL取得
+};
 ```
 
+## 🚀 Implementation Plan
+
+### Phase 2-1: Foundation (2 sessions) ✅
+- [x] `middleware.ts` - ルート保護
+- [x] `app/auth/page.tsx` - 認証ページ
+- [x] `app/admin/layout.tsx` - Admin layout
+- [x] Supabase Auth helpers setup
+
+### Phase 2-2: Dashboard + Profile Edit (2 sessions) ✅
+- [x] `app/admin/page.tsx` - Dashboard
+- [x] `app/admin/edit/page.tsx` - Profile編集
+- [x] 画像アップロード機能
+- [x] フォームバリデーション
+
+### Phase 2-3: Social Links (3 sessions) ✅
+- [x] `app/admin/social/page.tsx` - Social管理
+- [x] @dnd-kit ドラッグ&ドロップ
+- [x] SVG動的読み込み
+- [x] レスポンシブモーダル
+
+### Phase 2-4: Audio Management (3 sessions) ✅
+- [x] `app/admin/audio/page.tsx` - Audio管理  
+- [x] `app/api/soundcloud/route.ts` - oEmbed proxy
+- [x] トラック管理機能
+- [x] ドラッグ&ドロップ並び替え
+
+### Phase 2-5: Flyers (1 session) ✅
+- [x] `app/admin/flyers/page.tsx` - Flyer管理
+- [x] 削除機能のみ実装
+
+### Phase 2-6: Testing & Polish (1 session) ✅
+- [x] 全機能動作確認
+- [x] TypeScript コンパイル確認
+- [x] 開発サーバー動作確認
+
+## ✅ Success Criteria
+
+### Functional Requirements
+- [ ] React版と100%同一機能
+- [ ] 全デバイスでの完全動作
+- [ ] 既存Supabaseテーブル使用
+- [ ] **Profileページ絶対不変**
+
+### Technical Requirements  
+- [ ] Next.js 14 App Router準拠
+- [ ] TypeScript strict mode
+- [ ] Server/Client Components適切分離
+- [ ] モバイルファースト対応
+
+## 📊 Estimated Timeline
+
+**Total**: **12セッション** (既存DB使用により大幅短縮)
+
+- **Phase 2-1**: 2 sessions (Foundation)
+- **Phase 2-2**: 2 sessions (Dashboard + Edit)  
+- **Phase 2-3**: 3 sessions (Social Links)
+- **Phase 2-4**: 3 sessions (Audio Management)
+- **Phase 2-5**: 1 session (Flyers)
+- **Phase 2-6**: 1 session (Testing)
+
+## 🚨 Critical Rules
+
+1. **React版完全準拠**: 推測・改良一切なし
+2. **Profileページ絶対不変**: 明確指示なき限り一切変更禁止  
+3. **事前承認必須**: React版にない機能は全て事前承認
+4. **実装前確認**: 「これはReact版にありますか？」必須質問
+
 ---
 
-## 🏆 Phase 0完了記録
+**Ready to start Phase 2-1 (Foundation & Authentication) upon approval.**
 
-**完了日**: 2025-08-07  
-**実装期間**: 7セッション（集中開発）  
-**主要技術スタック**: Next.js 14, TypeScript, TailwindCSS, SoundCloud Widget API  
-**総コード行数**: 約2,000行（TypeScript + CSS）  
-**テスト環境**: 4つの実際のSoundCloudトラックでの完全動作確認済み  
-**解決した主要課題**: Progress Bar位置戻り、State競合、React Hooks Rules、Hydration Error  
-
-*音楽プレイヤーシステム実装完了 - Phase 1追加ページ実装へ移行準備完了*
+この計画はlinkflyer_reactの実際のコードに基づく正確な仕様です。

@@ -5,14 +5,21 @@ import Image from 'next/image'
 import SoundCloudPlayerV3SingleTwo from '../../components/SoundCloudPlayerV3SingleTwo'
 import FlyerModal from '../../components/FlyerModal'
 import { SoundCloudTrack } from '../../../lib/utils/dataTransform'
-import { Flyer } from '../../../types/database'
+import { Flyer, Social } from '../../../types/database'
 
-// Define social platforms to display
+// Define all social platforms (matching admin implementation)
 const socialPlatforms = [
-  { id: 'instagram', name: 'Instagram', field: 'instagram_username', type: 'username' },
-  { id: 'soundcloud', name: 'SoundCloud', field: 'soundcloud_url', type: 'url' },
-  { id: 'bandcamp', name: 'Bandcamp', field: 'bandcamp_url', type: 'url' },
-  { id: 'discogs', name: 'Discogs', field: 'discogs_url', type: 'url' },
+  { id: 'instagram', name: 'Instagram', field: 'instagram_username', type: 'username', baseUrl: 'https://instagram.com/' },
+  { id: 'threads', name: 'Threads', field: 'threads_username', type: 'username', baseUrl: 'https://threads.net/' },
+  { id: 'tiktok', name: 'TikTok', field: 'tiktok_username', type: 'username', baseUrl: 'https://tiktok.com/' },
+  { id: 'x', name: 'X', field: 'x_username', type: 'username', baseUrl: 'https://x.com/' },
+  { id: 'facebook', name: 'Facebook', field: 'facebook_url', type: 'url', baseUrl: '' },
+  { id: 'youtube', name: 'YouTube', field: 'youtube_url', type: 'url', baseUrl: '' },
+  { id: 'discogs', name: 'Discogs', field: 'discogs_url', type: 'url', baseUrl: '' },
+  { id: 'bandcamp', name: 'Bandcamp', field: 'bandcamp_url', type: 'url', baseUrl: '' },
+  { id: 'soundcloud', name: 'SoundCloud', field: 'soundcloud_url', type: 'url', baseUrl: '' },
+  { id: 'website', name: 'Website', field: 'website_url', type: 'url', baseUrl: '' },
+  { id: 'email', name: 'Email', field: 'email_address', type: 'email', baseUrl: 'mailto:' },
 ]
 
 interface ProfileClientProps {
@@ -21,16 +28,26 @@ interface ProfileClientProps {
     display_name: string | null
     bio: string | null
     profile_image: string | null
+    // Legacy social fields (for backward compatibility)
     instagram_username: string | null
-    soundcloud_url: string | null
-    bandcamp_url: string | null
+    threads_username: string | null
+    tiktok_username: string | null
+    x_username: string | null
+    facebook_url: string | null
+    youtube_url: string | null
     discogs_url: string | null
+    bandcamp_url: string | null
+    soundcloud_url: string | null
+    website_url: string | null
+    email_address: string | null
+    social_links_order: string | null
   }
+  socialLinks: Social[]
   tracks: SoundCloudTrack[]
   flyers: Flyer[]
 }
 
-export default function ProfileClient({ profile, tracks, flyers }: ProfileClientProps) {
+export default function ProfileClient({ profile, socialLinks, tracks, flyers }: ProfileClientProps) {
   const [activeTab, setActiveTab] = useState<'audio' | 'flyers'>('audio')
   const [svgIcons, setSvgIcons] = useState<Record<string, string>>({})
   const [selectedFlyer, setSelectedFlyer] = useState<Flyer | null>(null)
@@ -95,35 +112,44 @@ export default function ProfileClient({ profile, tracks, flyers }: ProfileClient
           )}
           
           {/* Social Icons */}
-          <div className="mt-4 flex justify-center space-x-4">
-            {socialPlatforms.map((platform) => {
-              const value = profile[platform.field as keyof typeof profile] as string | null
-              if (!value) return null
+          <div className="mt-4 flex justify-center flex-wrap gap-4 max-w-xs mx-auto">
+            {socialLinks
+              .filter(social => social.active)
+              .sort((a, b) => a.order_index - b.order_index)
+              .map((social) => {
+                const platform = socialPlatforms.find(p => p.id === social.platform)
+                if (!platform) return null
 
-              // Construct URL based on platform type
-              let url = ''
-              if (platform.type === 'username') {
-                if (platform.id === 'instagram') url = `https://instagram.com/${value}`
-              } else {
-                url = value
-              }
+                // Construct URL based on platform type
+                let url = ''
+                if (platform.type === 'username') {
+                  // Remove @ if present and construct full URL
+                  const username = social.value.replace('@', '')
+                  url = platform.baseUrl + username
+                } else if (platform.type === 'email') {
+                  url = platform.baseUrl + social.value
+                } else {
+                  // URL type - use as is
+                  url = social.value
+                }
 
-              return (
-                <a 
-                  key={platform.id}
-                  href={url} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="text-gray-600 hover:text-gray-900 transition-colors"
-                >
-                  <span className="sr-only">{platform.name}</span>
-                  <div 
-                    className="w-6 h-6"
-                    dangerouslySetInnerHTML={{ __html: svgIcons[platform.id] || '' }}
-                  />
-                </a>
-              )
-            })}
+                return (
+                  <a 
+                    key={social.id}
+                    href={url} 
+                    target={platform.type === 'email' ? '_self' : '_blank'}
+                    rel="noopener noreferrer" 
+                    className="text-gray-600 hover:text-gray-900 transition-colors flex-shrink-0"
+                    title={`${platform.name}: ${platform.type === 'username' ? '@' + social.value.replace('@', '') : social.value}`}
+                  >
+                    <span className="sr-only">{platform.name}</span>
+                    <div 
+                      className="w-6 h-6"
+                      dangerouslySetInnerHTML={{ __html: svgIcons[platform.id] || '' }}
+                    />
+                  </a>
+                )
+              })}
           </div>
         </div>
 
