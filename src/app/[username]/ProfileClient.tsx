@@ -89,7 +89,7 @@ export default function ProfileClient({ profile, socialLinks, tracks, flyers }: 
 
   return (
     <div className="min-h-screen bg-gray-100 py-8">
-      <div className="max-w-md mx-auto px-4">
+      <div className="max-w-md md:max-w-4xl mx-auto px-4">
         {/* Profile Header */}
         <div className="text-center mb-8">
           <div className="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden">
@@ -181,7 +181,7 @@ export default function ProfileClient({ profile, socialLinks, tracks, flyers }: 
         {activeTab === 'audio' ? (
           <>
             {/* Audio Tracks Grid */}
-            <div className="grid grid-cols-2 gap-4 mb-20">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-20">
               {tracks.map((track, index) => (
                 <SoundCloudPlayerV3SingleTwo
                   key={`player-grid-${index}`}
@@ -198,7 +198,7 @@ export default function ProfileClient({ profile, socialLinks, tracks, flyers }: 
           </>
         ) : (
           /* Flyers Grid */
-          <div className="grid grid-cols-2 gap-4 mb-20">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-20">
             {flyers.length > 0 ? (
               flyers.map((flyer, index) => (
                 <div 
