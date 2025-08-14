@@ -57,6 +57,7 @@ export interface Flyer {
   event_date: string | null
   venue_name: string | null
   venue_address: string | null
+  address_components: any[] | null
   geocode_lat: number | null
   geocode_lng: number | null
   created_at: string
