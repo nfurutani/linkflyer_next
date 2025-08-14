@@ -284,3 +284,6 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
 **Ready to start Phase 2-1 (Foundation & Authentication) upon approval.**
 
 この計画はlinkflyer_reactの実際のコードに基づく正確な仕様です。
+
+NEXT STEP
+fast apiをgoogle cloud runに実装してproductionでもflyer解析ができる様にする
