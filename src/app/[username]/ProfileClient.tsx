@@ -222,11 +222,33 @@ export default function ProfileClient({ profile, socialLinks, tracks, flyers }: 
                           {new Date(flyer.event_date).toLocaleDateString('ja-JP')}
                         </p>
                       )}
+                      
                       {flyer.venue_name && (
-                        <p className="text-white text-xs opacity-90 line-clamp-1">
+                        <p className="text-white text-xs opacity-90 line-clamp-1 mb-1">
                           {flyer.venue_name}
                         </p>
                       )}
+                      
+                      {/* Location information from address_components */}
+                      {(() => {
+                        const components = flyer.address_components as any[]
+                        if (components && components.length > 0) {
+                          const country = components.find(c => c.types?.includes('country'))?.short_name
+                          const prefecture = components.find(c => c.types?.includes('administrative_area_level_1'))?.short_name  
+                          const locality = components.find(c => c.types?.includes('locality'))?.short_name
+                          
+                          const locationParts = [locality, prefecture, country].filter(Boolean)
+                          
+                          if (locationParts.length > 0) {
+                            return (
+                              <p className="text-white text-xs opacity-90 line-clamp-1">
+                                {locationParts.join(', ')}
+                              </p>
+                            )
+                          }
+                        }
+                        return null
+                      })()}
                     </div>
                   </div>
                 </div>

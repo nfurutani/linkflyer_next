@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClientSupabaseClient } from '@/lib/supabase/client'
 import Image from 'next/image'
+import { FlyerUpload } from '@/components/flyers/FlyerUpload'
 
 interface Flyer {
   id: string
@@ -30,8 +31,32 @@ export default function AdminFlyersClient({ initialProfile, initialFlyers, userI
   const [profile, setProfile] = useState(initialProfile)
   const [flyers, setFlyers] = useState<Flyer[]>(initialFlyers)
   const [deleting, setDeleting] = useState<string | null>(null)
+  const [showUpload, setShowUpload] = useState(false)
   const router = useRouter()
   const supabase = createClientSupabaseClient()
+
+  const refreshFlyers = async () => {
+    try {
+      const { data: updatedFlyers, error } = await supabase
+        .from('flyers')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('active', true)
+        .is('deleted_at', null)
+        .order('created_at', { ascending: false })
+      
+      if (!error && updatedFlyers) {
+        setFlyers(updatedFlyers)
+      }
+    } catch (error) {
+      console.error('Error refreshing flyers:', error)
+    }
+  }
+
+  const handleUploadSuccess = () => {
+    setShowUpload(false)
+    refreshFlyers()
+  }
 
   const handleDeleteFlyer = async (flyer: Flyer) => {
     if (!window.confirm('Are you sure you want to delete this flyer? This action cannot be undone.')) {
@@ -107,30 +132,41 @@ export default function AdminFlyersClient({ initialProfile, initialFlyers, userI
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6" style={{ paddingTop: '120px' }}>
-        {/* Upload Section (Coming Soon) */}
+        {/* Upload Section */}
         <div className="bg-white shadow rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="text-lg font-semibold">Upload Event Flyer</h2>
               <p className="text-sm text-gray-500">Share your upcoming events</p>
             </div>
-            <button
-              disabled
-              className="flex items-center gap-2 px-4 py-2 bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            {!showUpload && (
+              <button
+                onClick={() => setShowUpload(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                Upload Flyer
+              </button>
+            )}
+          </div>
+          
+          {showUpload ? (
+            <FlyerUpload
+              userId={userId}
+              onSuccess={handleUploadSuccess}
+              onCancel={() => setShowUpload(false)}
+            />
+          ) : (
+            <div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+              <svg className="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
               </svg>
-              Upload Flyer (Coming Soon)
-            </button>
-          </div>
-          <div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-            <svg className="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-            </svg>
-            <p className="text-gray-500">Drag and drop flyer images here</p>
-            <p className="text-sm text-gray-400 mt-2">Upload functionality coming soon!</p>
-          </div>
+              <p className="text-gray-500">Click "Upload Flyer" to get started</p>
+              <p className="text-sm text-gray-400 mt-2">AI will analyze your flyer and extract event details</p>
+            </div>
+          )}
         </div>
 
         {/* Flyers Grid */}

@@ -61,7 +61,7 @@ export async function getFlyersByUserId(userId: string) {
       .select('*')
       .eq('user_id', userId)
       .eq('active', true)
-      .order('created_at', { ascending: false })
+      .order('event_date', { ascending: false })
 
     if (error) {
       throw error
